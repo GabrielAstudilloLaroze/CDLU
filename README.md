@@ -12,3 +12,9 @@ Proceso de descarga y actualización de datos de Canvas
 -tidyverse
 -googlesheets4
 -reshape2
+
+```{r}
+install.packages("tidyverse")
+install.packages("googlesheets4")
+install.packages("reshape2")
+```
