@@ -29,3 +29,24 @@ gs4_auth()
 ```
 Se va a abrir una pestaña en el navegador, para autorizar permisos desde una cuenta de google. Seleccionar la cuenta que se va a utilizar y dar **todos** los permisos solicitados y cerrar.
 
+7. Revisar consistencia del sistema de referencias de las googlesheets.  
+  Se debe revisar si es que se utilizarán las mismas hojas de cálculo referenciadas en los scripts (utilizadas en 2021, asociadas a la cuenta gabriel.astudillo.l@usach.cl).  
+  Si se utilizarán nuevas hojas de cálculo, se deben modificar en los scripts, y gestionar los permisos correspondientes con los equipos directivos de cada colegio.
+  
+## Provisionamiento de tickets.
+
+Este script contiene los comandos para descarga de todos los archivos desde Canvas Data. Por lo tanto se debe ejecutar **primero** que la actualización de pruebas.
+
+El script tiene tres grandes procesos:  
+1. Descarga de datos.  
+2. Organización de los datos.  
+3. Subida de datos por liceo en hojas de cálculo separadas.
+
+La organización de los datos se divide en:  
+1. Limpieza de datos de estudiantes.  
+2. Filtrar solo tickets de salida.  
+3. Organizar los tickets por orden de publicación dentro cada asignatura.  
+4. Cálculo de indicadores de resumen por estudiante-asignatura: Número de tickets publicados por asignatura, número de tickets contestados por el estudiante, % de participación, % de logro promedio en los tickets de la asignatura.  
+
+
+
