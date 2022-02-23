@@ -81,5 +81,6 @@ Hay un archivo Rmd que recoge las particularidades de cada colegio, más uno que
 
 Antes de ejecutarlos, se debe tener en consideración:  
 1. Actualizar el filtro (y título del documento) de acuerdo al ciclo evaluativo que se quiere realizar los informes. Se debe modificar en cada archivo Rmd.  
-2. Rmarkdown funciona en una sesión diferente, por lo que las rutas de los datos ```data_est.Rdata``` y ```bd_evaluaciones.Rdata``` deben actualizarse en cada archivo Rmd, de acuerdo a su ubicación completa al pc en el cual se esté trabajando (ej. C://user/documents/Canvas Data/Reportes por liceo/data_est.Rdata).
+2. Rmarkdown funciona en una sesión diferente, por lo que las rutas de los datos ```data_est.Rdata``` y ```bd_evaluaciones.Rdata``` deben actualizarse en cada archivo Rmd, de acuerdo a su ubicación completa al pc en el cual se esté trabajando (ej. C://user/documents/Canvas Data/Reportes por liceo/data_est.Rdata).  
+3. Para que estos informes contengan la información completa de los estudiantes que rindieron las pruebas, deben ser ejecutados **48 hrs. después del cierre de la evaluacion en Canvas**. De lo contrario, habrán inconsistencias en los datos.
 
