@@ -65,5 +65,21 @@ La principal diferencia es en la organización de los datos:
   
 Las googlesheets de destino son diferentes a las de los tickets de salida, por lo que se debe volver a chequear la consistencia de las referencias.
 
-## Informes por colegio.
+## Informes de pruebas por colegio.
+
+Exporta informes desde Rmarkdown a los que hay que hacerle muy pocas modificaciones para que salgan.
+
+Se necesita un paquete extra: ```KableExtra```
+
+```{r}
+install.packages("kableExtra")
+```
+
+También se necesita instalar un motor de Latex para R como ```tinytex```.
+
+Hay un archivo Rmd que recoge las particularidades de cada colegio, más uno que corresponde a informe comparativo entre colegios.
+
+Antes de ejecutarlos, se debe tener en consideración:  
+1. Actualizar el filtro (y título del documento) de acuerdo al ciclo evaluativo que se quiere realizar los informes. Se debe modificar en cada archivo Rmd.  
+2. Rmarkdown funciona en una sesión diferente, por lo que las rutas de los datos ```data_est.Rdata``` y ```bd_evaluaciones.Rdata``` deben actualizarse en cada archivo Rmd, de acuerdo a su ubicación completa al pc en el cual se esté trabajando (ej. C://user/documents/Canvas Data/Reportes por liceo/data_est.Rdata).
 
