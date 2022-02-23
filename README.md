@@ -52,4 +52,18 @@ La organización de los datos se divide en:
   Una hoja distinta para cada asignatura, en la cual se incorporan todos los niveles y secciones que corresponden.  
   Cada columna corresponde al orden de publicación
 
+## Provisionamiento de pruebas.
+
+Todas las demás evaluaciones (Pruebas de Nivel, controles, ensayos simce, ensayos universitarios) se procesan aquí.
+
+El proceso es casi exactamente el mismo que para los tickets, con la diferencia que ya partimos con los datos descargados. Luego, filtramos las evaluaciones que nos interesan en este proceso (excluyendo los ticket de salida).
+
+La principal diferencia es en la organización de los datos:  
+  -Debemos clasificar las evaluaciones por tipo ("Control", "PDN", "Ensayo Simce", "Ensayo PDT").  
+  -Según el tipo de evaluación, debemos seguir procesos diferentes para identificar su orden: Los controles y ensayos se ordenan igual que los tickets de salida (por orden de publicación dentro de la asignatura), pero las Pruebas de Nivel se ordenan según su posición en ciclo de evaluaciones del año.  
+  -Por ello, en el script, hay que configurar el ciclo evaluativo correspondiente al año en curso. Actualmente, para la comprension, está el bloque de código que configuraba el calendario 2021.  
+  
+Las googlesheets de destino son diferentes a las de los tickets de salida, por lo que se debe volver a chequear la consistencia de las referencias.
+
+## Informes por colegio.
 
