@@ -1,6 +1,9 @@
 #Descarga de datos.
 
-#Para que funcione correctamente, se debe eliminar los archivos GZ previos en la carpeta gz.
+#Para que funcione correctamente, se debe eliminar los archivos GZ comprimidos previos en la carpeta gz.
+#NO TOCAR schema.json, que contiene el esquema de datos, necesario para que funcione el comando unnpack.
+
+
 shell('canvasDataCli fetch -c config.js -t user_dim')
 shell('canvasDataCli fetch -c config.js -t enrollment_dim')
 shell('canvasDataCli fetch -c config.js -t quiz_dim')
@@ -124,14 +127,14 @@ borrar<-c(" PRIMERO MEDIO" = "",
           " SEGUNDO MEDIO" = "",
           " TERCERO MEDIO" = "",
           " CUARTO MEDIO" = "",
-          " PRIMERO B¡SICO" = "",
-          " SEGUNDO B¡SICO" = "",
-          " TERCERO B¡SICO" = "",
-          " CUARTO B¡SICO" = "",
-          " QUINTO B¡SICO" = "",
-          " SEXTO B¡SICO" = "",
-          " S…PTIMO B¡SICO" = "",
-          " OCTAVO B¡SICO" = "")
+          " PRIMERO B√ÅSICO" = "",
+          " SEGUNDO B√ÅSICO" = "",
+          " TERCERO B√ÅSICO" = "",
+          " CUARTO B√ÅSICO" = "",
+          " QUINTO B√ÅSICO" = "",
+          " SEXTO B√ÅSICO" = "",
+          " S√âPTIMO B√ÅSICO" = "",
+          " OCTAVO B√ÅSICO" = "")
 
 
 course_dim$name<-str_replace_all(course_dim$name, borrar)
@@ -184,7 +187,7 @@ assignment_dim <- read_delim("~/Canvas Data/datos/assignment_dim.txt",
 
 
 
-#Si es que hay discordancias en el estado de los estudiantes, este bloque de cÛdigo lo corrige.
+#Si es que hay discordancias en el estado de los estudiantes, este bloque de c√≥digo lo corrige.
 retir<-enrollment_dim%>%
   filter(type == "StudentEnrollment" | type == "StudentViewEnrollment")%>%
   group_by(user_id,id,workflow_state)%>%
@@ -217,7 +220,7 @@ enrollment_dim<-enrollment_dim%>%
 
 
 #Si es que hay estudiantes retirados, que no se hayan actualizado en canvas,
-#aquÌ se pueden incorporar manualmente mediante su user_id.
+#aqu√≠ se pueden incorporar manualmente mediante su user_id.
 
 enrollment_dim<-enrollment_dim%>%
   filter(!(user_id == "#user_id estudiante retirado 1" |
@@ -225,7 +228,7 @@ enrollment_dim<-enrollment_dim%>%
 
 
 
-#Si es que hay estudiantes que no figuran en alg˙n curso, aquÌ se puede actualizar manualmente su estado
+#Si es que hay estudiantes que no figuran en alg√∫n curso, aqu√≠ se puede actualizar manualmente su estado
 #mediante user_id
 
 enrollment_dim$workflow_state[enrollment_dim$user_id=="#user_id estudiante faltante 1"]<-"active"
@@ -234,11 +237,11 @@ enrollment_dim$workflow_state[enrollment_dim$user_id=="#user_id estudiante falta
 
 
 
-#Si es que hay tickets de salida que no aparecen, aquÌ se puede corregir
+#Si es que hay tickets de salida que no aparecen, aqu√≠ se puede corregir
 quiz_dim$points_possible[quiz_dim$id == "quiz_id ticket faltante"]<-5
 
 
-##El siguiente bloque de texto crea un contador de tickets de salida de acuerdo al orden de publicaciÛn dentro de la asignatura.
+##El siguiente bloque de texto crea un contador de tickets de salida de acuerdo al orden de publicaci√≥n dentro de la asignatura.
 mq<-module_item_dim%>%
   filter(!(quiz_id == "\\N"))%>%
   select(module_id,quiz_id)
@@ -280,7 +283,7 @@ t_date$semana<- as.numeric(trunc(t_date$semana, digits = 0))#borrar decimales.
 
 
 
-#Definir semestre. En este caso, se tomÛ como referencia la semana 22. Reemplazar si es necesario.
+#Definir semestre. En este caso, se tom√≥ como referencia la semana 22. Reemplazar si es necesario.
 t_date$semestre<-NA
 t_date$semestre[t_date$semana>=22]<-2
 t_date<-t_date%>%
@@ -363,7 +366,7 @@ data_est<-(left_join(data_est, et.cuentas, by = "account_id", copy=FALSE))
 #traer niveles
 data_est<-(left_join(data_est, nivel, by = "course_id", copy = FALSE))
 
-#Traer etiquetas de secciÛn
+#Traer etiquetas de secci√≥n
 et.secciones<-cbind.data.frame(course_section_dim$id, course_section_dim$name)
 names(et.secciones) =c("section_id", "seccion")
 data_est<-(left_join(data_est,et.secciones, by = "section_id", copy=FALSE))
@@ -383,7 +386,7 @@ data_est<-(left_join(data_est,et.cursos, by = "course_id", copy=FALSE))
 
 
 
-#Si es que todavÌa existen, eliminar "estudiantes de prueba"
+#Si es que todav√≠a existen, eliminar "estudiantes de prueba"
 data_est <- data_est%>%
   filter(!(nombre == 'prueba, Estudiante de'),!(is.na(nivel)))
 
@@ -394,12 +397,12 @@ data_est<-left_join(data_est,tickets_contestados,by ="enrollment_rollup_id")
 
 data_est$`Tickets contestados`[is.na(data_est$`Tickets contestados`)]<-0
 
-data_est$`% de participaciÛn`<-round((data_est$`Tickets contestados`/data_est$`Tickets Publicados`),digits =  2)
+data_est$`% de participaci√≥n`<-round((data_est$`Tickets contestados`/data_est$`Tickets Publicados`),digits =  2)
 
 
 
 
-#####etiquetas de estudiantes,colegio,secciÛn, nivel, para--> tickets
+#####etiquetas de estudiantes,colegio,secci√≥n, nivel, para--> tickets
 etiq<-data_est%>%
   select(enrollment_rollup_id,cuenta,nivel,seccion,nombre,cursos)
 
@@ -441,16 +444,16 @@ names(tickets) =c("quiz_id",
                   "count",
                   "Colegio",
                   "Nivel",
-                  "SecciÛn",
+                  "Secci√≥n",
                   "Nombre",
-                  "Asignatura o mÛdulo")
+                  "Asignatura o m√≥dulo")
 
 
 col_p<-tickets%>%
   filter(Colegio== "Liceo Industrial de Angol")%>%
   summarise(
-    Nivel, SecciÛn,
-    Nombre,  `Asignatura o mÛdulo`,
+    Nivel, Secci√≥n,
+    Nombre,  `Asignatura o m√≥dulo`,
     n_ticket,p_logro
   )
 col_p<-distinct(col_p)
@@ -458,12 +461,12 @@ col_p<-distinct(col_p)
 col<-data_est%>%
   filter(cuenta== "Liceo Industrial de Angol")%>%
   summarise(Nivel = nivel,
-            SecciÛn = seccion,
+            Secci√≥n = seccion,
             Nombre=nombre,
-            `Asignatura o mÛdulo`=cursos,
+            `Asignatura o m√≥dulo`=cursos,
             `Tickets Publicados`,
             `Tickets contestados`, 
-            `% de participaciÛn`,
+            `% de participaci√≥n`,
             p_logro)
 
 
@@ -480,7 +483,7 @@ gs4_auth()
 #####################################################################################
 
 
-#Chequear consistencia de referencias en hojas de c·lculo de google de CADA LICEO.
+#Chequear consistencia de referencias en hojas de c√°lculo de google de CADA LICEO.
 sh<-("https://docs.google.com/spreadsheets/d/1zGKHXjQvpsfLlr_aB12a3RVBU2vs1sDrkX-8FZvhrZ8/edit#gid=1447080458")
 SHdata<-read_sheet(sh)
 write_sheet(col, sh, sheet = "Data")
@@ -489,263 +492,263 @@ write_sheet(col, sh, sheet = "Data")
 library(reshape2)  
 
 bd_col_lyl<-col%>%
-  filter(`Asignatura o mÛdulo` == "LENGUA Y LITERATURA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "LENGUA Y LITERATURA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_lyl<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "LENGUA Y LITERATURA")
+  filter(`Asignatura o m√≥dulo` == "LENGUA Y LITERATURA")
 
-col_lyl<-dcast(col_lyl, `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_lyl<-dcast(col_lyl, `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_lyl<-col_lyl%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_lyl<-left_join(bd_col_lyl,col_lyl,by = "Nombre", copi= FALSE)
 
-col_lyl <- col_lyl[order(col_lyl$Nivel,col_lyl$SecciÛn,col_lyl$Nombre),]
+col_lyl <- col_lyl[order(col_lyl$Nivel,col_lyl$Secci√≥n,col_lyl$Nombre),]
 
 write_sheet(col_lyl, sh, sheet = "LENGUA Y LITERATURA")
 
 
 bd_col_mat<-col%>%
-  filter(`Asignatura o mÛdulo` == "MATEM¡TICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "MATEM√ÅTICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_mat<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "MATEM¡TICA")
+  filter(`Asignatura o m√≥dulo` == "MATEM√ÅTICA")
 
-col_mat<-dcast(col_mat,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_mat<-dcast(col_mat,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_mat<-col_mat%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_mat<-left_join(bd_col_mat,col_mat,by = "Nombre", copi= FALSE)
 
-col_mat <- col_mat[order(col_mat$Nivel,col_mat$SecciÛn,col_mat$Nombre),]
-write_sheet(col_mat, sh, sheet = "MATEM¡TICA")
+col_mat <- col_mat[order(col_mat$Nivel,col_mat$Secci√≥n,col_mat$Nombre),]
+write_sheet(col_mat, sh, sheet = "MATEM√ÅTICA")
 
 bd_col_bio<-col%>%
-  filter(`Asignatura o mÛdulo` == "BIOLOGÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "BIOLOG√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_bio<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "BIOLOGÕA")
+  filter(`Asignatura o m√≥dulo` == "BIOLOG√çA")
 
-col_bio<-dcast(col_bio,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_bio<-dcast(col_bio,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_bio<-col_bio%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_bio<-left_join(bd_col_bio,col_bio,by = "Nombre", copi= FALSE)
 
-col_bio <- col_bio[order(col_bio$Nivel,col_bio$SecciÛn,col_bio$Nombre),]
-write_sheet(col_bio, sh, sheet = "BIOLOGÕA")
+col_bio <- col_bio[order(col_bio$Nivel,col_bio$Secci√≥n,col_bio$Nombre),]
+write_sheet(col_bio, sh, sheet = "BIOLOG√çA")
 
 
 bd_col_fisic<-col%>%
-  filter(`Asignatura o mÛdulo` == "FÕSICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "F√çSICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_fisic<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FÕSICA")
-col_fisic<-dcast(col_fisic,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "F√çSICA")
+col_fisic<-dcast(col_fisic,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_fisic<-col_fisic%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_fisic<-left_join(bd_col_fisic,col_fisic,by = "Nombre", copi= FALSE)
 
-col_fisic <- col_fisic[order(col_fisic$Nivel,col_fisic$SecciÛn,col_fisic$Nombre),]
-write_sheet(col_fisic, sh, sheet = "FÕSICA")
+col_fisic <- col_fisic[order(col_fisic$Nivel,col_fisic$Secci√≥n,col_fisic$Nombre),]
+write_sheet(col_fisic, sh, sheet = "F√çSICA")
 
 bd_col_quim<-col%>%
-  filter(`Asignatura o mÛdulo` == "QUÕMICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "QU√çMICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_quim<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "QUÕMICA")
-col_quim<-dcast(col_quim,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "QU√çMICA")
+col_quim<-dcast(col_quim,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 
 col_quim<-col_quim%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_quim<-left_join(bd_col_quim,col_quim,by = "Nombre", copi= FALSE)
 
-col_quim <- col_quim[order(col_quim$Nivel,col_quim$SecciÛn,col_quim$Nombre),]
+col_quim <- col_quim[order(col_quim$Nivel,col_quim$Secci√≥n,col_quim$Nombre),]
 
-write_sheet(col_quim, sh, sheet = "QUÕMICA")         
+write_sheet(col_quim, sh, sheet = "QU√çMICA")         
 
 bd_col_cc<-col%>%
-  filter(`Asignatura o mÛdulo` == "CIENCIAS PARA LA CIUDADANÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "CIENCIAS PARA LA CIUDADAN√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_cc<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "CIENCIAS PARA LA CIUDADANÕA")
-col_cc<-dcast(col_cc,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "CIENCIAS PARA LA CIUDADAN√çA")
+col_cc<-dcast(col_cc,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_cc<-col_cc%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_cc<-left_join(bd_col_cc,col_cc,by = "Nombre", copi= FALSE)
 
-col_cc <- col_cc[order(col_cc$Nivel,col_cc$SecciÛn,col_cc$Nombre),]
-write_sheet(col_cc, sh, sheet = "CIENCIAS PARA LA CIUDADANÕA")
+col_cc <- col_cc[order(col_cc$Nivel,col_cc$Secci√≥n,col_cc$Nombre),]
+write_sheet(col_cc, sh, sheet = "CIENCIAS PARA LA CIUDADAN√çA")
 
 
 
 bd_col_emp<-col%>%
-  filter(`Asignatura o mÛdulo` == "EMPRENDIMIENTO")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "EMPRENDIMIENTO")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_emp<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "EMPRENDIMIENTO")
-col_emp<-dcast(col_emp,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "EMPRENDIMIENTO")
+col_emp<-dcast(col_emp,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_emp<-col_emp%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_emp<-left_join(bd_col_emp,col_emp,by = "Nombre", copi= FALSE)
 
-col_emp <- col_emp[order(col_emp$Nivel,col_emp$SecciÛn,col_emp$Nombre),]
+col_emp <- col_emp[order(col_emp$Nivel,col_emp$Secci√≥n,col_emp$Nombre),]
 write_sheet(col_emp, sh, sheet = "EMPRENDIMIENTO")                  
 
 
 bd_col_filo<-col%>%
-  filter(`Asignatura o mÛdulo` == "FILOSOFÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "FILOSOF√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_filo<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FILOSOFÕA")
-col_filo<-dcast(col_filo,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "FILOSOF√çA")
+col_filo<-dcast(col_filo,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_filo<-col_filo%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_filo<-left_join(bd_col_filo,col_filo,by = "Nombre", copi= FALSE)
 
-col_filo <- col_filo[order(col_filo$Nivel,col_filo$SecciÛn,col_filo$Nombre),]
+col_filo <- col_filo[order(col_filo$Nivel,col_filo$Secci√≥n,col_filo$Nombre),]
 
-write_sheet(col_filo, sh, sheet = "FILOSOFÕA")
+write_sheet(col_filo, sh, sheet = "FILOSOF√çA")
 
 
 
 bd_col_hist<-col%>%
-  filter(`Asignatura o mÛdulo` == "HISTORIA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "HISTORIA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_hist<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "HISTORIA")
-col_hist<-dcast(col_hist,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "HISTORIA")
+col_hist<-dcast(col_hist,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_hist<-col_hist%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_hist<-left_join(bd_col_hist,col_hist,by = "Nombre", copi= FALSE)
-col_hist <- col_hist[order(col_hist$Nivel,col_hist$SecciÛn,col_hist$Nombre),]
+col_hist <- col_hist[order(col_hist$Nivel,col_hist$Secci√≥n,col_hist$Nombre),]
 write_sheet(col_hist, sh, sheet = "HISTORIA")
 
 
 bd_col_ing<-col%>%
-  filter(`Asignatura o mÛdulo` == "INGL…S")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "INGL√âS")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_ing<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "INGL…S")
-col_ing<-dcast(col_ing,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "INGL√âS")
+col_ing<-dcast(col_ing,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_ing<-col_ing%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_ing<-left_join(bd_col_ing,col_ing,by = "Nombre", copi= FALSE)
-col_ing <- col_ing[order(col_ing$Nivel,col_ing$SecciÛn,col_ing$Nombre),]
+col_ing <- col_ing[order(col_ing$Nivel,col_ing$Secci√≥n,col_ing$Nombre),]
 
-write_sheet(col_ing, sh, sheet = "INGL…S")
+write_sheet(col_ing, sh, sheet = "INGL√âS")
 
 
 
 
 bd_col_fc<-col%>%
-  filter(`Asignatura o mÛdulo` == "FORMACI”N CIUDADANA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "FORMACI√ìN CIUDADANA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_fc<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FORMACI”N CIUDADANA")
-col_fc<-dcast(col_fc,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "FORMACI√ìN CIUDADANA")
+col_fc<-dcast(col_fc,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_fc<-col_fc%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_fc<-left_join(bd_col_fc,col_fc,by = "Nombre", copi= FALSE)
 
-col_fc <- col_fc[order(col_fc$Nivel,col_fc$SecciÛn,col_fc$Nombre),]
+col_fc <- col_fc[order(col_fc$Nivel,col_fc$Secci√≥n,col_fc$Nombre),]
 
-write_sheet(col_fc, sh, sheet = "FORMACI”N CIUDADANA")
+write_sheet(col_fc, sh, sheet = "FORMACI√ìN CIUDADANA")
 
 
-#Revisar si es que hay modificaciones en los nombres de mÛdulos de especialidad.
+#Revisar si es que hay modificaciones en los nombres de m√≥dulos de especialidad.
 
 bd_col_especialidad<-data_est%>%
   filter(cuenta== "Liceo Industrial de Angol",cursos == "AJUSTE DE MOTORES" |
-           cursos == "AUTOMATIZACI”N DE SISTEMAS EL…CTRICOS INDUSTRIALES" |                                   
-           cursos == "FRESADO DE PIEZAS Y CONJUNTOS MEC¡NICOS - TALADRADO Y RECTIFICADO DE PIEZAS MEC¡NICAS" |
-           cursos == "INSTALACI”N DE MOTORES Y EQUIPOS DE CALEFACCI”N" |                                      
-           cursos == "INSTALACI”N DE SISTEMAS DE CONTROL EL…CTRICO INDUSTRIAL" |                              
-           cursos == "INSTALACIONES EL…CTRICAS DOMICILIARIAS" |                                               
-           cursos == "INSTALACIONES EL…CTRICAS INDUSTRIALES" |                                                
+           cursos == "AUTOMATIZACI√ìN DE SISTEMAS EL√âCTRICOS INDUSTRIALES" |                                   
+           cursos == "FRESADO DE PIEZAS Y CONJUNTOS MEC√ÅNICOS - TALADRADO Y RECTIFICADO DE PIEZAS MEC√ÅNICAS" |
+           cursos == "INSTALACI√ìN DE MOTORES Y EQUIPOS DE CALEFACCI√ìN" |                                      
+           cursos == "INSTALACI√ìN DE SISTEMAS DE CONTROL EL√âCTRICO INDUSTRIAL" |                              
+           cursos == "INSTALACIONES EL√âCTRICAS DOMICILIARIAS" |                                               
+           cursos == "INSTALACIONES EL√âCTRICAS INDUSTRIALES" |                                                
            cursos == "MANEJO DE RESIDUOS Y DESECHOS AUTOMOTRICES" |
            cursos == "MANTENIMIENTO DE HERRAMIENTAS" |
-           cursos == "MANTENIMIENTO DE LOS SISTEMAS DE DIRECCI”N Y SUSPENSI”N" |
-           cursos == "MANTENIMIENTO DE LOS SISTEMAS DE TRANSMISI”N Y FRENADO" |
-           cursos == "MANTENIMIENTO DE LOS SISTEMAS EL…CTRICOS Y ELECTR”NICOS" |
-           cursos == "MANTENIMIENTO DE M¡QUINAS - EQUIPOS Y SISTEMAS EL…CTRICOS" |
+           cursos == "MANTENIMIENTO DE LOS SISTEMAS DE DIRECCI√ìN Y SUSPENSI√ìN" |
+           cursos == "MANTENIMIENTO DE LOS SISTEMAS DE TRANSMISI√ìN Y FRENADO" |
+           cursos == "MANTENIMIENTO DE LOS SISTEMAS EL√âCTRICOS Y ELECTR√ìNICOS" |
+           cursos == "MANTENIMIENTO DE M√ÅQUINAS - EQUIPOS Y SISTEMAS EL√âCTRICOS" |
            cursos == "MANTENIMIENTO DE MOTORES" |
-           cursos == "MEC¡NICA DE BANCO" |
-           cursos == "MECANIZADO CON M¡QUINAS DE CONTROL NUM…RICO" |
+           cursos == "MEC√ÅNICA DE BANCO" |
+           cursos == "MECANIZADO CON M√ÅQUINAS DE CONTROL NUM√âRICO" |
            cursos == "SOLDADURA INDUSTRIAL" |
-           cursos == "TORNEADO DE PIEZAS Y CONJUNTOS MEC¡NICOS")%>%
+           cursos == "TORNEADO DE PIEZAS Y CONJUNTOS MEC√ÅNICOS")%>%
   summarise(enrollment_rollup_id,
             Nivel = nivel,
-            SecciÛn = seccion,
+            Secci√≥n = seccion,
             Nombre=nombre,
-            `Asignatura o mÛdulo`=cursos)
+            `Asignatura o m√≥dulo`=cursos)
 
 
 col_especialidad<-tickets%>%
-  filter(Colegio== "Liceo Industrial de Angol",`Asignatura o mÛdulo` == "AJUSTE DE MOTORES" |
-           `Asignatura o mÛdulo` == "AUTOMATIZACI”N DE SISTEMAS EL…CTRICOS INDUSTRIALES" |                                   
-           `Asignatura o mÛdulo` == "FRESADO DE PIEZAS Y CONJUNTOS MEC¡NICOS - TALADRADO Y RECTIFICADO DE PIEZAS MEC¡NICAS" |
-           `Asignatura o mÛdulo` == "INSTALACI”N DE MOTORES Y EQUIPOS DE CALEFACCI”N" |                                      
-           `Asignatura o mÛdulo` == "INSTALACI”N DE SISTEMAS DE CONTROL EL…CTRICO INDUSTRIAL" |                              
-           `Asignatura o mÛdulo` == "INSTALACIONES EL…CTRICAS DOMICILIARIAS" |                                               
-           `Asignatura o mÛdulo` == "INSTALACIONES EL…CTRICAS INDUSTRIALES" |                                                
-           `Asignatura o mÛdulo` == "MANEJO DE RESIDUOS Y DESECHOS AUTOMOTRICES" |
-           `Asignatura o mÛdulo` == "MANTENIMIENTO DE HERRAMIENTAS" |
-           `Asignatura o mÛdulo` == "MANTENIMIENTO DE LOS SISTEMAS DE DIRECCI”N Y SUSPENSI”N" |
-           `Asignatura o mÛdulo` == "MANTENIMIENTO DE LOS SISTEMAS DE TRANSMISI”N Y FRENADO" |
-           `Asignatura o mÛdulo` == "MANTENIMIENTO DE LOS SISTEMAS EL…CTRICOS Y ELECTR”NICOS" |
-           `Asignatura o mÛdulo` == "MANTENIMIENTO DE M¡QUINAS - EQUIPOS Y SISTEMAS EL…CTRICOS" |
-           `Asignatura o mÛdulo` == "MANTENIMIENTO DE MOTORES" |
-           `Asignatura o mÛdulo` == "MEC¡NICA DE BANCO" |
-           `Asignatura o mÛdulo` == "MECANIZADO CON M¡QUINAS DE CONTROL C" |
-           `Asignatura o mÛdulo` == "SOLDADURA INDUSTRIAL" |
-           `Asignatura o mÛdulo` == "TORNEADO DE PIEZAS Y CONJUNTOS MEC¡NICOS")%>%
+  filter(Colegio== "Liceo Industrial de Angol",`Asignatura o m√≥dulo` == "AJUSTE DE MOTORES" |
+           `Asignatura o m√≥dulo` == "AUTOMATIZACI√ìN DE SISTEMAS EL√âCTRICOS INDUSTRIALES" |                                   
+           `Asignatura o m√≥dulo` == "FRESADO DE PIEZAS Y CONJUNTOS MEC√ÅNICOS - TALADRADO Y RECTIFICADO DE PIEZAS MEC√ÅNICAS" |
+           `Asignatura o m√≥dulo` == "INSTALACI√ìN DE MOTORES Y EQUIPOS DE CALEFACCI√ìN" |                                      
+           `Asignatura o m√≥dulo` == "INSTALACI√ìN DE SISTEMAS DE CONTROL EL√âCTRICO INDUSTRIAL" |                              
+           `Asignatura o m√≥dulo` == "INSTALACIONES EL√âCTRICAS DOMICILIARIAS" |                                               
+           `Asignatura o m√≥dulo` == "INSTALACIONES EL√âCTRICAS INDUSTRIALES" |                                                
+           `Asignatura o m√≥dulo` == "MANEJO DE RESIDUOS Y DESECHOS AUTOMOTRICES" |
+           `Asignatura o m√≥dulo` == "MANTENIMIENTO DE HERRAMIENTAS" |
+           `Asignatura o m√≥dulo` == "MANTENIMIENTO DE LOS SISTEMAS DE DIRECCI√ìN Y SUSPENSI√ìN" |
+           `Asignatura o m√≥dulo` == "MANTENIMIENTO DE LOS SISTEMAS DE TRANSMISI√ìN Y FRENADO" |
+           `Asignatura o m√≥dulo` == "MANTENIMIENTO DE LOS SISTEMAS EL√âCTRICOS Y ELECTR√ìNICOS" |
+           `Asignatura o m√≥dulo` == "MANTENIMIENTO DE M√ÅQUINAS - EQUIPOS Y SISTEMAS EL√âCTRICOS" |
+           `Asignatura o m√≥dulo` == "MANTENIMIENTO DE MOTORES" |
+           `Asignatura o m√≥dulo` == "MEC√ÅNICA DE BANCO" |
+           `Asignatura o m√≥dulo` == "MECANIZADO CON M√ÅQUINAS DE CONTROL C" |
+           `Asignatura o m√≥dulo` == "SOLDADURA INDUSTRIAL" |
+           `Asignatura o m√≥dulo` == "TORNEADO DE PIEZAS Y CONJUNTOS MEC√ÅNICOS")%>%
   summarise(enrollment_rollup_id,
             enrollment_rollup_id,
             n_ticket,p_logro)
@@ -756,7 +759,7 @@ col_especialidad<-dcast(col_especialidad,  enrollment_rollup_id~n_ticket, fun.ag
 col_especialidad<-left_join(bd_col_especialidad,col_especialidad,by = "enrollment_rollup_id", copi= FALSE)
 
 
-col_especialidad <- col_especialidad[order(col_especialidad$Nivel,col_especialidad$SecciÛn,col_especialidad$`Asignatura o mÛdulo`,col_especialidad$Nombre),]
+col_especialidad <- col_especialidad[order(col_especialidad$Nivel,col_especialidad$Secci√≥n,col_especialidad$`Asignatura o m√≥dulo`,col_especialidad$Nombre),]
 
 col_especialidad<-col_especialidad%>%
   select(-c(enrollment_rollup_id))
@@ -781,24 +784,24 @@ rm(sh,col_p,col,bd_col_lyl,col_lyl,bd_col_mat,col_mat,bd_col_bio,col_bio,bd_col_
 
 
 col_p<-tickets%>%
-  filter(Colegio== "Instituto Comercial Eliodoro DomÌnguez",
+  filter(Colegio== "Instituto Comercial Eliodoro Dom√≠nguez",
          !(is.na(p_logro)))%>%
   summarise(
-    Nivel, SecciÛn,
-    Nombre,  `Asignatura o mÛdulo`,
+    Nivel, Secci√≥n,
+    Nombre,  `Asignatura o m√≥dulo`,
     n_ticket,p_logro
   )
 col_p<-distinct(col_p)
 
 col<-data_est%>%
-  filter(cuenta== "Instituto Comercial Eliodoro DomÌnguez")%>%
+  filter(cuenta== "Instituto Comercial Eliodoro Dom√≠nguez")%>%
   summarise(Nivel = nivel,
-            SecciÛn = seccion,
+            Secci√≥n = seccion,
             Nombre=nombre,
-            `Asignatura o mÛdulo`=cursos,
+            `Asignatura o m√≥dulo`=cursos,
             `Tickets Publicados`,
             `Tickets contestados`, 
-            `% de participaciÛn`,
+            `% de participaci√≥n`,
             p_logro)
 
 
@@ -810,259 +813,259 @@ write_sheet(col, sh, sheet = "Data")
 
 
 bd_col_lyl<-col%>%
-  filter(`Asignatura o mÛdulo` == "LENGUA Y LITERATURA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "LENGUA Y LITERATURA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_lyl<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "LENGUA Y LITERATURA")
+  filter(`Asignatura o m√≥dulo` == "LENGUA Y LITERATURA")
 
-col_lyl<-dcast(col_lyl, `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_lyl<-dcast(col_lyl, `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_lyl<-col_lyl%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_lyl<-left_join(bd_col_lyl,col_lyl,by = "Nombre", copi= FALSE)
 
-col_lyl <- col_lyl[order(col_lyl$Nivel,col_lyl$SecciÛn,col_lyl$Nombre),]
+col_lyl <- col_lyl[order(col_lyl$Nivel,col_lyl$Secci√≥n,col_lyl$Nombre),]
 
 write_sheet(col_lyl, sh, sheet = "LENGUA Y LITERATURA")
 
 
 bd_col_mat<-col%>%
-  filter(`Asignatura o mÛdulo` == "MATEM¡TICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "MATEM√ÅTICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_mat<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "MATEM¡TICA")
+  filter(`Asignatura o m√≥dulo` == "MATEM√ÅTICA")
 
-col_mat<-dcast(col_mat,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_mat<-dcast(col_mat,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_mat<-col_mat%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_mat<-left_join(bd_col_mat,col_mat,by = "Nombre", copi= FALSE)
 
-col_mat <- col_mat[order(col_mat$Nivel,col_mat$SecciÛn,col_mat$Nombre),]
-write_sheet(col_mat, sh, sheet = "MATEM¡TICA")
+col_mat <- col_mat[order(col_mat$Nivel,col_mat$Secci√≥n,col_mat$Nombre),]
+write_sheet(col_mat, sh, sheet = "MATEM√ÅTICA")
 
 bd_col_bio<-col%>%
-  filter(`Asignatura o mÛdulo` == "BIOLOGÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "BIOLOG√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_bio<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "BIOLOGÕA")
+  filter(`Asignatura o m√≥dulo` == "BIOLOG√çA")
 
-col_bio<-dcast(col_bio,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_bio<-dcast(col_bio,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_bio<-col_bio%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_bio<-left_join(bd_col_bio,col_bio,by = "Nombre", copi= FALSE)
 
-col_bio <- col_bio[order(col_bio$Nivel,col_bio$SecciÛn,col_bio$Nombre),]
-write_sheet(col_bio, sh, sheet = "BIOLOGÕA")
+col_bio <- col_bio[order(col_bio$Nivel,col_bio$Secci√≥n,col_bio$Nombre),]
+write_sheet(col_bio, sh, sheet = "BIOLOG√çA")
 
 
 bd_col_fisic<-col%>%
-  filter(`Asignatura o mÛdulo` == "FÕSICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "F√çSICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_fisic<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FÕSICA")
-col_fisic<-dcast(col_fisic,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "F√çSICA")
+col_fisic<-dcast(col_fisic,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_fisic<-col_fisic%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_fisic<-left_join(bd_col_fisic,col_fisic,by = "Nombre", copi= FALSE)
 
-col_fisic <- col_fisic[order(col_fisic$Nivel,col_fisic$SecciÛn,col_fisic$Nombre),]
-write_sheet(col_fisic, sh, sheet = "FÕSICA")
+col_fisic <- col_fisic[order(col_fisic$Nivel,col_fisic$Secci√≥n,col_fisic$Nombre),]
+write_sheet(col_fisic, sh, sheet = "F√çSICA")
 
 bd_col_quim<-col%>%
-  filter(`Asignatura o mÛdulo` == "QUÕMICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "QU√çMICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_quim<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "QUÕMICA")
-col_quim<-dcast(col_quim,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "QU√çMICA")
+col_quim<-dcast(col_quim,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 
 col_quim<-col_quim%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_quim<-left_join(bd_col_quim,col_quim,by = "Nombre", copi= FALSE)
 
-col_quim <- col_quim[order(col_quim$Nivel,col_quim$SecciÛn,col_quim$Nombre),]
+col_quim <- col_quim[order(col_quim$Nivel,col_quim$Secci√≥n,col_quim$Nombre),]
 
-write_sheet(col_quim, sh, sheet = "QUÕMICA")         
+write_sheet(col_quim, sh, sheet = "QU√çMICA")         
 
 bd_col_cc<-col%>%
-  filter(`Asignatura o mÛdulo` == "CIENCIAS PARA LA CIUDADANÕA" | `Asignatura o mÛdulo` == "CIENCIAS PARA LA CIUDADANIA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "CIENCIAS PARA LA CIUDADAN√çA" | `Asignatura o m√≥dulo` == "CIENCIAS PARA LA CIUDADANIA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_cc<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "CIENCIAS PARA LA CIUDADANÕA" | `Asignatura o mÛdulo` == "CIENCIAS PARA LA CIUDADANIA")
-col_cc<-dcast(col_cc,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "CIENCIAS PARA LA CIUDADAN√çA" | `Asignatura o m√≥dulo` == "CIENCIAS PARA LA CIUDADANIA")
+col_cc<-dcast(col_cc,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_cc<-col_cc%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_cc<-left_join(bd_col_cc,col_cc,by = "Nombre", copi= FALSE)
 
-col_cc <- col_cc[order(col_cc$Nivel,col_cc$SecciÛn,col_cc$Nombre),]
-write_sheet(col_cc, sh, sheet = "CIENCIAS PARA LA CIUDADANÕA")
+col_cc <- col_cc[order(col_cc$Nivel,col_cc$Secci√≥n,col_cc$Nombre),]
+write_sheet(col_cc, sh, sheet = "CIENCIAS PARA LA CIUDADAN√çA")
 
 
 
 bd_col_emp<-col%>%
-  filter(`Asignatura o mÛdulo` == "EMPRENDIMIENTO")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "EMPRENDIMIENTO")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_emp<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "EMPRENDIMIENTO")
-col_emp<-dcast(col_emp,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "EMPRENDIMIENTO")
+col_emp<-dcast(col_emp,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_emp<-col_emp%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_emp<-left_join(bd_col_emp,col_emp,by = "Nombre", copi= FALSE)
 
-col_emp <- col_emp[order(col_emp$Nivel,col_emp$SecciÛn,col_emp$Nombre),]
+col_emp <- col_emp[order(col_emp$Nivel,col_emp$Secci√≥n,col_emp$Nombre),]
 write_sheet(col_emp, sh, sheet = "EMPRENDIMIENTO")                  
 
 
 bd_col_filo<-col%>%
-  filter(`Asignatura o mÛdulo` == "FILOSOFÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "FILOSOF√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_filo<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FILOSOFÕA")
-col_filo<-dcast(col_filo,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "FILOSOF√çA")
+col_filo<-dcast(col_filo,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_filo<-col_filo%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_filo<-left_join(bd_col_filo,col_filo,by = "Nombre", copi= FALSE)
 
-col_filo <- col_filo[order(col_filo$Nivel,col_filo$SecciÛn,col_filo$Nombre),]
+col_filo <- col_filo[order(col_filo$Nivel,col_filo$Secci√≥n,col_filo$Nombre),]
 
-write_sheet(col_filo, sh, sheet = "FILOSOFÕA")
+write_sheet(col_filo, sh, sheet = "FILOSOF√çA")
 
 
 
 bd_col_hist<-col%>%
-  filter(`Asignatura o mÛdulo` == "HISTORIA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "HISTORIA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_hist<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "HISTORIA")
-col_hist<-dcast(col_hist,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "HISTORIA")
+col_hist<-dcast(col_hist,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_hist<-col_hist%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_hist<-left_join(bd_col_hist,col_hist,by = "Nombre", copi= FALSE)
-col_hist <- col_hist[order(col_hist$Nivel,col_hist$SecciÛn,col_hist$Nombre),]
+col_hist <- col_hist[order(col_hist$Nivel,col_hist$Secci√≥n,col_hist$Nombre),]
 write_sheet(col_hist, sh, sheet = "HISTORIA")
 
 
 bd_col_ing<-col%>%
-  filter(`Asignatura o mÛdulo` == "INGL…S")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "INGL√âS")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_ing<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "INGL…S")
-col_ing<-dcast(col_ing,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "INGL√âS")
+col_ing<-dcast(col_ing,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_ing<-col_ing%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_ing<-left_join(bd_col_ing,col_ing,by = "Nombre", copi= FALSE)
-col_ing <- col_ing[order(col_ing$Nivel,col_ing$SecciÛn,col_ing$Nombre),]
+col_ing <- col_ing[order(col_ing$Nivel,col_ing$Secci√≥n,col_ing$Nombre),]
 
-write_sheet(col_ing, sh, sheet = "INGL…S")
+write_sheet(col_ing, sh, sheet = "INGL√âS")
 
 
 
 
 bd_col_fc<-col%>%
-  filter(`Asignatura o mÛdulo` == "FORMACI”N CIUDADANA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "FORMACI√ìN CIUDADANA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_fc<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FORMACI”N CIUDADANA")
-col_fc<-dcast(col_fc,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "FORMACI√ìN CIUDADANA")
+col_fc<-dcast(col_fc,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_fc<-col_fc%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_fc<-left_join(bd_col_fc,col_fc,by = "Nombre", copi= FALSE)
 
-col_fc <- col_fc[order(col_fc$Nivel,col_fc$SecciÛn,col_fc$Nombre),]
+col_fc <- col_fc[order(col_fc$Nivel,col_fc$Secci√≥n,col_fc$Nombre),]
 
-write_sheet(col_fc, sh, sheet = "FORMACI”N CIUDADANA")
+write_sheet(col_fc, sh, sheet = "FORMACI√ìN CIUDADANA")
 
 
 
 
 
 bd_col_tec<-col%>%
-  filter(`Asignatura o mÛdulo` == "TECNOLOGÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "TECNOLOG√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_tec<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "TECNOLOGÕA")
-col_tec<-dcast(col_tec,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "TECNOLOG√çA")
+col_tec<-dcast(col_tec,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_tec<-col_tec%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_tec<-left_join(bd_col_tec,col_tec,by = "Nombre", copi= FALSE)
 
-col_tec <- col_tec[order(col_tec$Nivel,col_tec$SecciÛn,col_tec$Nombre),]
+col_tec <- col_tec[order(col_tec$Nivel,col_tec$Secci√≥n,col_tec$Nombre),]
 
-write_sheet(col_tec, sh, sheet = "TECNOLOGÕA")
+write_sheet(col_tec, sh, sheet = "TECNOLOG√çA")
 
 
 
 
 bd_col_arv<-col%>%
-  filter(`Asignatura o mÛdulo` == "ARTES VISUALES")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "ARTES VISUALES")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_arv<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "ARTES VISUALES")
-col_arv<-dcast(col_arv,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "ARTES VISUALES")
+col_arv<-dcast(col_arv,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_arv<-col_arv%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_arv<-left_join(bd_col_arv,col_arv,by = "Nombre", copi= FALSE)
 
-col_arv <- col_arv[order(col_arv$Nivel,col_arv$SecciÛn,col_arv$Nombre),]
+col_arv <- col_arv[order(col_arv$Nivel,col_arv$Secci√≥n,col_arv$Nombre),]
 
 write_sheet(col_arv, sh, sheet = "ARTES VISUALES")
 
@@ -1073,24 +1076,24 @@ write_sheet(col_arv, sh, sheet = "ARTES VISUALES")
 
 
 bd_col_mus<-col%>%
-  filter(`Asignatura o mÛdulo` == "M⁄SICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "M√öSICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_mus<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "M⁄SICA")
-col_mus<-dcast(col_mus,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "M√öSICA")
+col_mus<-dcast(col_mus,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_mus<-col_mus%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_mus<-left_join(bd_col_mus,col_mus,by = "Nombre", copi= FALSE)
 
-col_mus <- col_mus[order(col_mus$Nivel,col_mus$SecciÛn,col_mus$Nombre),]
+col_mus <- col_mus[order(col_mus$Nivel,col_mus$Secci√≥n,col_mus$Nombre),]
 
-write_sheet(col_mus, sh, sheet = "M⁄SICA")
+write_sheet(col_mus, sh, sheet = "M√öSICA")
 
 
 
@@ -1098,24 +1101,24 @@ write_sheet(col_mus, sh, sheet = "M⁄SICA")
 
 
 bd_col_efis<-col%>%
-  filter(`Asignatura o mÛdulo` == "EDUCACI”N FÕSICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "EDUCACI√ìN F√çSICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_efis<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "EDUCACI”N FÕSICA")
-col_efis<-dcast(col_efis,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "EDUCACI√ìN F√çSICA")
+col_efis<-dcast(col_efis,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_efis<-col_efis%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_efis<-left_join(bd_col_efis,col_efis,by = "Nombre", copi= FALSE)
 
-col_efis <- col_efis[order(col_efis$Nivel,col_efis$SecciÛn,col_efis$Nombre),]
+col_efis <- col_efis[order(col_efis$Nivel,col_efis$Secci√≥n,col_efis$Nombre),]
 
-write_sheet(col_efis, sh, sheet = "EDUCACI”N FÕSICA")
+write_sheet(col_efis, sh, sheet = "EDUCACI√ìN F√çSICA")
 
 
 
@@ -1123,47 +1126,47 @@ write_sheet(col_efis, sh, sheet = "EDUCACI”N FÕSICA")
 
 
 bd_col_especialidad<-data_est%>%
-  filter(cuenta== "Instituto Comercial Eliodoro DomÌnguez",
-         cursos == "APLICACIONES INFORM¡TICAS PARA LA GESTI”N ADMINISTRATIVA"    |   
-           cursos == "Aplicaciones Inform·ticas Segundo Medio"                      |  
-           cursos == "ATENCI”N AL CLIENTE"                                           | 
-           cursos == "C¡LCULO DE REMUNERACIONES - FINIQUITOS Y OBLIGACIONES LABORALES"|
-           cursos == "C¡LCULO Y REGISTRO DE IMPUESTOS"                                |
-           cursos == "C¡LCULO Y REGISTRO DE REMUNERACIONES"                           |
-           cursos == "CONTABILIDAD B¡SICA Y COMPRAVENTA"                              |
-           cursos == "CONTABILIDAD B¡SICA Y GESTI”N TRIBUTARIA"                       |
-           cursos == "DOTACI”N PERSONAL"                                              |
-           cursos == "ElaboraciÛn de Informes Contables y Financieros Cuarto Medio"                  |
-           cursos == "INTRODUCCI”N A LA ESPECIALIDAD"                                 |
-           cursos == "LEGISLACI”N LABORAL"                                            |
+  filter(cuenta== "Instituto Comercial Eliodoro Dom√≠nguez",
+         cursos == "APLICACIONES INFORM√ÅTICAS PARA LA GESTI√ìN ADMINISTRATIVA"    |   
+           cursos == "Aplicaciones Inform√°ticas Segundo Medio"                      |  
+           cursos == "ATENCI√ìN AL CLIENTE"                                           | 
+           cursos == "C√ÅLCULO DE REMUNERACIONES - FINIQUITOS Y OBLIGACIONES LABORALES"|
+           cursos == "C√ÅLCULO Y REGISTRO DE IMPUESTOS"                                |
+           cursos == "C√ÅLCULO Y REGISTRO DE REMUNERACIONES"                           |
+           cursos == "CONTABILIDAD B√ÅSICA Y COMPRAVENTA"                              |
+           cursos == "CONTABILIDAD B√ÅSICA Y GESTI√ìN TRIBUTARIA"                       |
+           cursos == "DOTACI√ìN PERSONAL"                                              |
+           cursos == "Elaboraci√≥n de Informes Contables y Financieros Cuarto Medio"                  |
+           cursos == "INTRODUCCI√ìN A LA ESPECIALIDAD"                                 |
+           cursos == "LEGISLACI√ìN LABORAL"                                            |
            cursos == "O. OFICINA"                                                     |
            cursos == "PROCESO ADMINISTRATIVO"                                         |
            cursos == "REGISTRO DE OPERACIONES DE COMERCIO NACIONAL E INTERNACIONAL"                                 
   )%>%
   summarise(enrollment_rollup_id,
             Nivel = nivel,
-            SecciÛn = seccion,
+            Secci√≥n = seccion,
             Nombre=nombre,
-            `Asignatura o mÛdulo`=cursos)
+            `Asignatura o m√≥dulo`=cursos)
 
 
 col_especialidad<-tickets%>%
-  filter(Colegio== "Instituto Comercial Eliodoro DomÌnguez",
-         `Asignatura o mÛdulo` == "APLICACIONES INFORM¡TICAS PARA LA GESTI”N ADMINISTRATIVA"    |   
-           `Asignatura o mÛdulo` == "Aplicaciones Inform·ticas Segundo Medio"                      |  
-           `Asignatura o mÛdulo` == "ATENCI”N AL CLIENTE"                                           | 
-           `Asignatura o mÛdulo` == "C¡LCULO DE REMUNERACIONES - FINIQUITOS Y OBLIGACIONES LABORALES"|
-           `Asignatura o mÛdulo` == "C¡LCULO Y REGISTRO DE IMPUESTOS"                                |
-           `Asignatura o mÛdulo` == "C¡LCULO Y REGISTRO DE REMUNERACIONES"                           |
-           `Asignatura o mÛdulo` == "CONTABILIDAD B¡SICA Y COMPRAVENTA"                              |
-           `Asignatura o mÛdulo` == "CONTABILIDAD B¡SICA Y GESTI”N TRIBUTARIA"                       |
-           `Asignatura o mÛdulo` == "DOTACI”N PERSONAL"                                              |
-           `Asignatura o mÛdulo` == "ElaboraciÛn de Informes Contables y Financieros Cuarto Medio"                  |
-           `Asignatura o mÛdulo` == "INTRODUCCI”N A LA ESPECIALIDAD"                                 |
-           `Asignatura o mÛdulo` == "LEGISLACI”N LABORAL"                                            |
-           `Asignatura o mÛdulo` == "O. OFICINA"                                                     |
-           `Asignatura o mÛdulo` == "PROCESO ADMINISTRATIVO"                                         |
-           `Asignatura o mÛdulo` == "REGISTRO DE OPERACIONES DE COMERCIO NACIONAL E INTERNACIONAL"
+  filter(Colegio== "Instituto Comercial Eliodoro Dom√≠nguez",
+         `Asignatura o m√≥dulo` == "APLICACIONES INFORM√ÅTICAS PARA LA GESTI√ìN ADMINISTRATIVA"    |   
+           `Asignatura o m√≥dulo` == "Aplicaciones Inform√°ticas Segundo Medio"                      |  
+           `Asignatura o m√≥dulo` == "ATENCI√ìN AL CLIENTE"                                           | 
+           `Asignatura o m√≥dulo` == "C√ÅLCULO DE REMUNERACIONES - FINIQUITOS Y OBLIGACIONES LABORALES"|
+           `Asignatura o m√≥dulo` == "C√ÅLCULO Y REGISTRO DE IMPUESTOS"                                |
+           `Asignatura o m√≥dulo` == "C√ÅLCULO Y REGISTRO DE REMUNERACIONES"                           |
+           `Asignatura o m√≥dulo` == "CONTABILIDAD B√ÅSICA Y COMPRAVENTA"                              |
+           `Asignatura o m√≥dulo` == "CONTABILIDAD B√ÅSICA Y GESTI√ìN TRIBUTARIA"                       |
+           `Asignatura o m√≥dulo` == "DOTACI√ìN PERSONAL"                                              |
+           `Asignatura o m√≥dulo` == "Elaboraci√≥n de Informes Contables y Financieros Cuarto Medio"                  |
+           `Asignatura o m√≥dulo` == "INTRODUCCI√ìN A LA ESPECIALIDAD"                                 |
+           `Asignatura o m√≥dulo` == "LEGISLACI√ìN LABORAL"                                            |
+           `Asignatura o m√≥dulo` == "O. OFICINA"                                                     |
+           `Asignatura o m√≥dulo` == "PROCESO ADMINISTRATIVO"                                         |
+           `Asignatura o m√≥dulo` == "REGISTRO DE OPERACIONES DE COMERCIO NACIONAL E INTERNACIONAL"
   )%>%
   summarise(enrollment_rollup_id,
             n_ticket,p_logro)
@@ -1174,7 +1177,7 @@ col_especialidad<-dcast(col_especialidad,  enrollment_rollup_id~n_ticket, fun.ag
 col_especialidad<-left_join(bd_col_especialidad,col_especialidad,by = "enrollment_rollup_id", copi= FALSE)
 
 
-col_especialidad <- col_especialidad[order(col_especialidad$Nivel,col_especialidad$SecciÛn,col_especialidad$`Asignatura o mÛdulo`,col_especialidad$Nombre),]
+col_especialidad <- col_especialidad[order(col_especialidad$Nivel,col_especialidad$Secci√≥n,col_especialidad$`Asignatura o m√≥dulo`,col_especialidad$Nombre),]
 
 col_especialidad<-col_especialidad%>%
   select(-c(enrollment_rollup_id))
@@ -1195,27 +1198,27 @@ rm(sh,col_p,col,bd_col_lyl,col_lyl,bd_col_mat,col_mat,bd_col_bio,col_bio,bd_col_
 #####################################################################################
 
 
-##NO INCLUYE TALLERES ARTÕSTICOS.
+##NO INCLUYE TALLERES ART√çSTICOS.
 
 
 col_p<-tickets%>%
-  filter(Colegio== "Liceo Experimental ArtÌstico")%>%
+  filter(Colegio== "Liceo Experimental Art√≠stico")%>%
   summarise(
-    Nivel, SecciÛn,
-    Nombre,  `Asignatura o mÛdulo`,
+    Nivel, Secci√≥n,
+    Nombre,  `Asignatura o m√≥dulo`,
     n_ticket,p_logro)
 
 col_p<-distinct(col_p)
 
 col<-data_est%>%
-  filter(cuenta== "Liceo Experimental ArtÌstico")%>%
+  filter(cuenta== "Liceo Experimental Art√≠stico")%>%
   summarise(Nivel = nivel,
-            SecciÛn = seccion,
+            Secci√≥n = seccion,
             Nombre=nombre,
-            `Asignatura o mÛdulo`=cursos,
+            `Asignatura o m√≥dulo`=cursos,
             `Tickets Publicados`,
             `Tickets contestados`, 
-            `% de participaciÛn`,
+            `% de participaci√≥n`,
             p_logro)
 
 
@@ -1227,218 +1230,218 @@ write_sheet(col, sh, sheet = "Data")
 
 
 bd_col_lyl<-col%>%
-  filter(`Asignatura o mÛdulo` == "LENGUA Y LITERATURA" | `Asignatura o mÛdulo` == "LENGUAJE Y COMUNICACI”N")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "LENGUA Y LITERATURA" | `Asignatura o m√≥dulo` == "LENGUAJE Y COMUNICACI√ìN")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_lyl<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "LENGUA Y LITERATURA" | `Asignatura o mÛdulo` == "LENGUAJE Y COMUNICACI”N")
+  filter(`Asignatura o m√≥dulo` == "LENGUA Y LITERATURA" | `Asignatura o m√≥dulo` == "LENGUAJE Y COMUNICACI√ìN")
 
-col_lyl<-dcast(col_lyl, `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_lyl<-dcast(col_lyl, `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_lyl<-col_lyl%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_lyl<-left_join(bd_col_lyl,col_lyl,by = "Nombre", copi= FALSE)
 
-col_lyl <- col_lyl[order(col_lyl$Nivel,col_lyl$SecciÛn,col_lyl$Nombre),]
+col_lyl <- col_lyl[order(col_lyl$Nivel,col_lyl$Secci√≥n,col_lyl$Nombre),]
 
 write_sheet(col_lyl, sh, sheet = "LENGUA Y LITERATURA")
 
 
 bd_col_mat<-col%>%
-  filter(`Asignatura o mÛdulo` == "MATEM¡TICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "MATEM√ÅTICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_mat<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "MATEM¡TICA")
+  filter(`Asignatura o m√≥dulo` == "MATEM√ÅTICA")
 
-col_mat<-dcast(col_mat,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_mat<-dcast(col_mat,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_mat<-col_mat%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_mat<-left_join(bd_col_mat,col_mat,by = "Nombre", copi= FALSE)
 
-col_mat <- col_mat[order(col_mat$Nivel,col_mat$SecciÛn,col_mat$Nombre),]
-write_sheet(col_mat, sh, sheet = "MATEM¡TICA")
+col_mat <- col_mat[order(col_mat$Nivel,col_mat$Secci√≥n,col_mat$Nombre),]
+write_sheet(col_mat, sh, sheet = "MATEM√ÅTICA")
 
 
 #####
 #CIENCIAS NATURALES
 bd_col_cnat<-col%>%
-  filter(`Asignatura o mÛdulo` == "CIENCIAS NATURALES")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "CIENCIAS NATURALES")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_cnat<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "CIENCIAS NATURALES")
+  filter(`Asignatura o m√≥dulo` == "CIENCIAS NATURALES")
 
-col_cnat<-dcast(col_cnat,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_cnat<-dcast(col_cnat,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_cnat<-col_cnat%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_cnat<-left_join(bd_col_cnat,col_cnat,by = "Nombre", copi= FALSE)
 
-col_cnat <- col_cnat[order(col_cnat$Nivel,col_cnat$SecciÛn,col_cnat$Nombre),]
+col_cnat <- col_cnat[order(col_cnat$Nivel,col_cnat$Secci√≥n,col_cnat$Nombre),]
 write_sheet(col_cnat, sh, sheet = "CIENCIAS NATURALES")
 
 
 
 bd_col_bio<-col%>%
-  filter(`Asignatura o mÛdulo` == "BIOLOGÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "BIOLOG√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_bio<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "BIOLOGÕA")
+  filter(`Asignatura o m√≥dulo` == "BIOLOG√çA")
 
-col_bio<-dcast(col_bio,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_bio<-dcast(col_bio,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_bio<-col_bio%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_bio<-left_join(bd_col_bio,col_bio,by = "Nombre", copi= FALSE)
 
-col_bio <- col_bio[order(col_bio$Nivel,col_bio$SecciÛn,col_bio$Nombre),]
-write_sheet(col_bio, sh, sheet = "BIOLOGÕA")
+col_bio <- col_bio[order(col_bio$Nivel,col_bio$Secci√≥n,col_bio$Nombre),]
+write_sheet(col_bio, sh, sheet = "BIOLOG√çA")
 
 
 bd_col_fisic<-col%>%
-  filter(`Asignatura o mÛdulo` == "FÕSICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "F√çSICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_fisic<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FÕSICA")
-col_fisic<-dcast(col_fisic,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "F√çSICA")
+col_fisic<-dcast(col_fisic,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_fisic<-col_fisic%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_fisic<-left_join(bd_col_fisic,col_fisic,by = "Nombre", copi= FALSE)
 
-col_fisic <- col_fisic[order(col_fisic$Nivel,col_fisic$SecciÛn,col_fisic$Nombre),]
-write_sheet(col_fisic, sh, sheet = "FÕSICA")
+col_fisic <- col_fisic[order(col_fisic$Nivel,col_fisic$Secci√≥n,col_fisic$Nombre),]
+write_sheet(col_fisic, sh, sheet = "F√çSICA")
 
 bd_col_quim<-col%>%
-  filter(`Asignatura o mÛdulo` == "QUÕMICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "QU√çMICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_quim<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "QUÕMICA")
-col_quim<-dcast(col_quim,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "QU√çMICA")
+col_quim<-dcast(col_quim,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 
 col_quim<-col_quim%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_quim<-left_join(bd_col_quim,col_quim,by = "Nombre", copi= FALSE)
 
-col_quim <- col_quim[order(col_quim$Nivel,col_quim$SecciÛn,col_quim$Nombre),]
+col_quim <- col_quim[order(col_quim$Nivel,col_quim$Secci√≥n,col_quim$Nombre),]
 
-write_sheet(col_quim, sh, sheet = "QUÕMICA")         
+write_sheet(col_quim, sh, sheet = "QU√çMICA")         
 
 bd_col_cc<-col%>%
-  filter(`Asignatura o mÛdulo` == "CIENCIAS PARA LA CIUDADANÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "CIENCIAS PARA LA CIUDADAN√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_cc<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "CIENCIAS PARA LA CIUDADANÕA")
-col_cc<-dcast(col_cc,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "CIENCIAS PARA LA CIUDADAN√çA")
+col_cc<-dcast(col_cc,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_cc<-col_cc%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_cc<-left_join(bd_col_cc,col_cc,by = "Nombre", copi= FALSE)
 
-col_cc <- col_cc[order(col_cc$Nivel,col_cc$SecciÛn,col_cc$Nombre),]
-write_sheet(col_cc, sh, sheet = "CIENCIAS PARA LA CIUDADANÕA")
+col_cc <- col_cc[order(col_cc$Nivel,col_cc$Secci√≥n,col_cc$Nombre),]
+write_sheet(col_cc, sh, sheet = "CIENCIAS PARA LA CIUDADAN√çA")
 
 
 
 bd_col_filo<-col%>%
-  filter(`Asignatura o mÛdulo` == "FILOSOFÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "FILOSOF√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_filo<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FILOSOFÕA")
-col_filo<-dcast(col_filo,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "FILOSOF√çA")
+col_filo<-dcast(col_filo,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_filo<-col_filo%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_filo<-left_join(bd_col_filo,col_filo,by = "Nombre", copi= FALSE)
 
-col_filo <- col_filo[order(col_filo$Nivel,col_filo$SecciÛn,col_filo$Nombre),]
+col_filo <- col_filo[order(col_filo$Nivel,col_filo$Secci√≥n,col_filo$Nombre),]
 
-write_sheet(col_filo, sh, sheet = "FILOSOFÕA")
+write_sheet(col_filo, sh, sheet = "FILOSOF√çA")
 
 
 
 bd_col_hist<-col%>%
-  filter(`Asignatura o mÛdulo` == "HISTORIA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "HISTORIA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_hist<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "HISTORIA")
-col_hist<-dcast(col_hist,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "HISTORIA")
+col_hist<-dcast(col_hist,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_hist<-col_hist%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_hist<-left_join(bd_col_hist,col_hist,by = "Nombre", copi= FALSE)
-col_hist <- col_hist[order(col_hist$Nivel,col_hist$SecciÛn,col_hist$Nombre),]
+col_hist <- col_hist[order(col_hist$Nivel,col_hist$Secci√≥n,col_hist$Nombre),]
 write_sheet(col_hist, sh, sheet = "HISTORIA")
 
 
 bd_col_ing<-col%>%
-  filter(`Asignatura o mÛdulo` == "INGL…S")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "INGL√âS")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_ing<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "INGL…S")
-col_ing<-dcast(col_ing,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "INGL√âS")
+col_ing<-dcast(col_ing,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_ing<-col_ing%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_ing<-left_join(bd_col_ing,col_ing,by = "Nombre", copi= FALSE)
-col_ing <- col_ing[order(col_ing$Nivel,col_ing$SecciÛn,col_ing$Nombre),]
+col_ing <- col_ing[order(col_ing$Nivel,col_ing$Secci√≥n,col_ing$Nombre),]
 
-write_sheet(col_ing, sh, sheet = "INGL…S")
+write_sheet(col_ing, sh, sheet = "INGL√âS")
 
 
 
 
 bd_col_fc<-col%>%
-  filter(`Asignatura o mÛdulo` == "FORMACI”N CIUDADANA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "FORMACI√ìN CIUDADANA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_fc<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FORMACI”N CIUDADANA")
-col_fc<-dcast(col_fc,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "FORMACI√ìN CIUDADANA")
+col_fc<-dcast(col_fc,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_fc<-col_fc%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_fc<-left_join(bd_col_fc,col_fc,by = "Nombre", copi= FALSE)
 
-col_fc <- col_fc[order(col_fc$Nivel,col_fc$SecciÛn,col_fc$Nombre),]
+col_fc <- col_fc[order(col_fc$Nivel,col_fc$Secci√≥n,col_fc$Nombre),]
 
-write_sheet(col_fc, sh, sheet = "FORMACI”N CIUDADANA")
+write_sheet(col_fc, sh, sheet = "FORMACI√ìN CIUDADANA")
 
 
 rm(sh,col_p,col,bd_col_lyl,col_lyl,bd_col_mat,col_mat,bd_col_bio,col_bio,bd_col_fisic,
@@ -1457,8 +1460,8 @@ rm(sh,col_p,col,bd_col_lyl,col_lyl,bd_col_mat,col_mat,bd_col_bio,col_bio,bd_col_
 col_p<-tickets%>%
   filter(Colegio== "Liceo Industrial de Nueva Imperial")%>%
   summarise(
-    Nivel, SecciÛn,
-    Nombre,  `Asignatura o mÛdulo`,
+    Nivel, Secci√≥n,
+    Nombre,  `Asignatura o m√≥dulo`,
     n_ticket,p_logro
   )
 col_p<-distinct(col_p)
@@ -1466,12 +1469,12 @@ col_p<-distinct(col_p)
 col<-data_est%>%
   filter(cuenta== "Liceo Industrial de Nueva Imperial")%>%
   summarise(Nivel = nivel,
-            SecciÛn = seccion,
+            Secci√≥n = seccion,
             Nombre=nombre,
-            `Asignatura o mÛdulo`=cursos,
+            `Asignatura o m√≥dulo`=cursos,
             `Tickets Publicados`,
             `Tickets contestados`, 
-            `% de participaciÛn`,
+            `% de participaci√≥n`,
             p_logro)
 
 
@@ -1484,214 +1487,214 @@ write_sheet(col, sh, sheet = "Data")
 
 
 bd_col_lyl<-col%>%
-  filter(`Asignatura o mÛdulo` == "LENGUA Y LITERATURA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "LENGUA Y LITERATURA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_lyl<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "LENGUA Y LITERATURA")
+  filter(`Asignatura o m√≥dulo` == "LENGUA Y LITERATURA")
 
-col_lyl<-dcast(col_lyl, `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_lyl<-dcast(col_lyl, `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_lyl<-col_lyl%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_lyl<-left_join(bd_col_lyl,col_lyl,by = "Nombre", copi= FALSE)
 
-col_lyl <- col_lyl[order(col_lyl$Nivel,col_lyl$SecciÛn,col_lyl$Nombre),]
+col_lyl <- col_lyl[order(col_lyl$Nivel,col_lyl$Secci√≥n,col_lyl$Nombre),]
 
 write_sheet(col_lyl, sh, sheet = "LENGUA Y LITERATURA")
 
 
 bd_col_mat<-col%>%
-  filter(`Asignatura o mÛdulo` == "MATEM¡TICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "MATEM√ÅTICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_mat<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "MATEM¡TICA")
+  filter(`Asignatura o m√≥dulo` == "MATEM√ÅTICA")
 
-col_mat<-dcast(col_mat,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_mat<-dcast(col_mat,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_mat<-col_mat%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_mat<-left_join(bd_col_mat,col_mat,by = "Nombre", copi= FALSE)
 
-col_mat <- col_mat[order(col_mat$Nivel,col_mat$SecciÛn,col_mat$Nombre),]
-write_sheet(col_mat, sh, sheet = "MATEM¡TICA")
+col_mat <- col_mat[order(col_mat$Nivel,col_mat$Secci√≥n,col_mat$Nombre),]
+write_sheet(col_mat, sh, sheet = "MATEM√ÅTICA")
 
 bd_col_bio<-col%>%
-  filter(`Asignatura o mÛdulo` == "BIOLOGÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "BIOLOG√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_bio<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "BIOLOGÕA")
+  filter(`Asignatura o m√≥dulo` == "BIOLOG√çA")
 
-col_bio<-dcast(col_bio,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+col_bio<-dcast(col_bio,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_bio<-col_bio%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_bio<-left_join(bd_col_bio,col_bio,by = "Nombre", copi= FALSE)
 
-col_bio <- col_bio[order(col_bio$Nivel,col_bio$SecciÛn,col_bio$Nombre),]
-write_sheet(col_bio, sh, sheet = "BIOLOGÕA")
+col_bio <- col_bio[order(col_bio$Nivel,col_bio$Secci√≥n,col_bio$Nombre),]
+write_sheet(col_bio, sh, sheet = "BIOLOG√çA")
 
 
 bd_col_fisic<-col%>%
-  filter(`Asignatura o mÛdulo` == "FÕSICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "F√çSICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_fisic<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FÕSICA")
-col_fisic<-dcast(col_fisic,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "F√çSICA")
+col_fisic<-dcast(col_fisic,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_fisic<-col_fisic%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_fisic<-left_join(bd_col_fisic,col_fisic,by = "Nombre", copi= FALSE)
 
-col_fisic <- col_fisic[order(col_fisic$Nivel,col_fisic$SecciÛn,col_fisic$Nombre),]
-write_sheet(col_fisic, sh, sheet = "FÕSICA")
+col_fisic <- col_fisic[order(col_fisic$Nivel,col_fisic$Secci√≥n,col_fisic$Nombre),]
+write_sheet(col_fisic, sh, sheet = "F√çSICA")
 
 bd_col_quim<-col%>%
-  filter(`Asignatura o mÛdulo` == "QUÕMICA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "QU√çMICA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_quim<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "QUÕMICA")
-col_quim<-dcast(col_quim,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "QU√çMICA")
+col_quim<-dcast(col_quim,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 
 col_quim<-col_quim%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_quim<-left_join(bd_col_quim,col_quim,by = "Nombre", copi= FALSE)
 
-col_quim <- col_quim[order(col_quim$Nivel,col_quim$SecciÛn,col_quim$Nombre),]
+col_quim <- col_quim[order(col_quim$Nivel,col_quim$Secci√≥n,col_quim$Nombre),]
 
-write_sheet(col_quim, sh, sheet = "QUÕMICA")         
+write_sheet(col_quim, sh, sheet = "QU√çMICA")         
 
 bd_col_cc<-col%>%
-  filter(`Asignatura o mÛdulo` == "CIENCIAS PARA LA CIUDADANÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "CIENCIAS PARA LA CIUDADAN√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 col_cc<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "CIENCIAS PARA LA CIUDADANÕA")
-col_cc<-dcast(col_cc,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "CIENCIAS PARA LA CIUDADAN√çA")
+col_cc<-dcast(col_cc,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_cc<-col_cc%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_cc<-left_join(bd_col_cc,col_cc,by = "Nombre", copi= FALSE)
 
-col_cc <- col_cc[order(col_cc$Nivel,col_cc$SecciÛn,col_cc$Nombre),]
-write_sheet(col_cc, sh, sheet = "CIENCIAS PARA LA CIUDADANÕA")
+col_cc <- col_cc[order(col_cc$Nivel,col_cc$Secci√≥n,col_cc$Nombre),]
+write_sheet(col_cc, sh, sheet = "CIENCIAS PARA LA CIUDADAN√çA")
 
 
 
 bd_col_emp<-col%>%
-  filter(`Asignatura o mÛdulo` == "EMPRENDIMIENTO")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "EMPRENDIMIENTO")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_emp<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "EMPRENDIMIENTO")
-col_emp<-dcast(col_emp,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "EMPRENDIMIENTO")
+col_emp<-dcast(col_emp,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_emp<-col_emp%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_emp<-left_join(bd_col_emp,col_emp,by = "Nombre", copi= FALSE)
 
-col_emp <- col_emp[order(col_emp$Nivel,col_emp$SecciÛn,col_emp$Nombre),]
+col_emp <- col_emp[order(col_emp$Nivel,col_emp$Secci√≥n,col_emp$Nombre),]
 write_sheet(col_emp, sh, sheet = "EMPRENDIMIENTO")                  
 
 
 bd_col_filo<-col%>%
-  filter(`Asignatura o mÛdulo` == "FILOSOFÕA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "FILOSOF√çA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_filo<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FILOSOFÕA")
-col_filo<-dcast(col_filo,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "FILOSOF√çA")
+col_filo<-dcast(col_filo,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 col_filo<-col_filo%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_filo<-left_join(bd_col_filo,col_filo,by = "Nombre", copi= FALSE)
 
-col_filo <- col_filo[order(col_filo$Nivel,col_filo$SecciÛn,col_filo$Nombre),]
+col_filo <- col_filo[order(col_filo$Nivel,col_filo$Secci√≥n,col_filo$Nombre),]
 
-write_sheet(col_filo, sh, sheet = "FILOSOFÕA")
+write_sheet(col_filo, sh, sheet = "FILOSOF√çA")
 
 
 
 bd_col_hist<-col%>%
-  filter(`Asignatura o mÛdulo` == "HISTORIA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "HISTORIA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_hist<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "HISTORIA")
-col_hist<-dcast(col_hist,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "HISTORIA")
+col_hist<-dcast(col_hist,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_hist<-col_hist%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_hist<-left_join(bd_col_hist,col_hist,by = "Nombre", copi= FALSE)
-col_hist <- col_hist[order(col_hist$Nivel,col_hist$SecciÛn,col_hist$Nombre),]
+col_hist <- col_hist[order(col_hist$Nivel,col_hist$Secci√≥n,col_hist$Nombre),]
 write_sheet(col_hist, sh, sheet = "HISTORIA")
 
 
 bd_col_ing<-col%>%
-  filter(`Asignatura o mÛdulo` == "INGL…S")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "INGL√âS")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 col_ing<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "INGL…S")
-col_ing<-dcast(col_ing,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "INGL√âS")
+col_ing<-dcast(col_ing,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_ing<-col_ing%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_ing<-left_join(bd_col_ing,col_ing,by = "Nombre", copi= FALSE)
-col_ing <- col_ing[order(col_ing$Nivel,col_ing$SecciÛn,col_ing$Nombre),]
+col_ing <- col_ing[order(col_ing$Nivel,col_ing$Secci√≥n,col_ing$Nombre),]
 
-write_sheet(col_ing, sh, sheet = "INGL…S")
+write_sheet(col_ing, sh, sheet = "INGL√âS")
 
 
 
 
 bd_col_fc<-col%>%
-  filter(`Asignatura o mÛdulo` == "FORMACI”N CIUDADANA")%>%
-  select(Nivel,SecciÛn,Nombre,`Asignatura o mÛdulo`)
+  filter(`Asignatura o m√≥dulo` == "FORMACI√ìN CIUDADANA")%>%
+  select(Nivel,Secci√≥n,Nombre,`Asignatura o m√≥dulo`)
 
 
 
 col_fc<-col_p%>%
-  filter(`Asignatura o mÛdulo` == "FORMACI”N CIUDADANA")
-col_fc<-dcast(col_fc,  `Asignatura o mÛdulo`+Nivel+SecciÛn+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
+  filter(`Asignatura o m√≥dulo` == "FORMACI√ìN CIUDADANA")
+col_fc<-dcast(col_fc,  `Asignatura o m√≥dulo`+Nivel+Secci√≥n+Nombre~n_ticket, fun.aggregate = mean, value.var = "p_logro")
 
 
 col_fc<-col_fc%>%
-  select(-c(`Asignatura o mÛdulo`,Nivel,SecciÛn))
+  select(-c(`Asignatura o m√≥dulo`,Nivel,Secci√≥n))
 
 col_fc<-left_join(bd_col_fc,col_fc,by = "Nombre", copi= FALSE)
 
-col_fc <- col_fc[order(col_fc$Nivel,col_fc$SecciÛn,col_fc$Nombre),]
+col_fc <- col_fc[order(col_fc$Nivel,col_fc$Secci√≥n,col_fc$Nombre),]
 
-write_sheet(col_fc, sh, sheet = "FORMACI”N CIUDADANA")
+write_sheet(col_fc, sh, sheet = "FORMACI√ìN CIUDADANA")
 
 
 espec<-data_est%>%
@@ -1703,51 +1706,51 @@ espec$cursos
 
 bd_col_especialidad<-data_est%>%
   filter(cuenta== "Liceo Industrial de Nueva Imperial",
-         cursos == "ALBA—ILERÕAS ESTRUCTURALES Y NO ESTRUCTURALES" |
-           cursos == "AN¡LISIS DE MUESTRAS DE HORMIG”N - SUELOS Y MATERIALES" |
-           cursos == "AUTOMATIZACI”N DE SISTEMAS EL…CTRICOS INDUSTRIALES" |
-           cursos == "CARPINTERÕA ESTRUCTURAL (ABP)" |
+         cursos == "ALBA√ëILER√çAS ESTRUCTURALES Y NO ESTRUCTURALES" |
+           cursos == "AN√ÅLISIS DE MUESTRAS DE HORMIG√ìN - SUELOS Y MATERIALES" |
+           cursos == "AUTOMATIZACI√ìN DE SISTEMAS EL√âCTRICOS INDUSTRIALES" |
+           cursos == "CARPINTER√çA ESTRUCTURAL (ABP)" |
            cursos == "CUBICACION DE MATERIALES E INSUMOS" |
            cursos == "ENFIERRADURA PARA ELEMENTOS ESTRUCTURALES" |
-           cursos == "FRESADO DE PIEZAS Y CONJUNTOS MEC¡NICOS - TALADRADO Y RECTIFICADO DE PIEZAS MEC¡NICAS" |
-           cursos == "INSTALACI”N DE MOTORES Y EQUIPOS DE CALEFACCI”N" |
-           cursos == "INSTALACI”N DE SISTEMAS DE CONTROL EL…CTRICO INDUSTRIAL" |
-           cursos == "INSTALACIONES EL…CTRICAS DOMICILIARIAS" |
-           cursos == "INSTALACIONES EL…CTRICAS INDUSTRIALES" |
+           cursos == "FRESADO DE PIEZAS Y CONJUNTOS MEC√ÅNICOS - TALADRADO Y RECTIFICADO DE PIEZAS MEC√ÅNICAS" |
+           cursos == "INSTALACI√ìN DE MOTORES Y EQUIPOS DE CALEFACCI√ìN" |
+           cursos == "INSTALACI√ìN DE SISTEMAS DE CONTROL EL√âCTRICO INDUSTRIAL" |
+           cursos == "INSTALACIONES EL√âCTRICAS DOMICILIARIAS" |
+           cursos == "INSTALACIONES EL√âCTRICAS INDUSTRIALES" |
            cursos == "MANTENIMIENTO DE HERRAMIENTAS" |
-           cursos == "MANTENIMIENTO DE MAQUINAS - EQUIPOS Y SISTEMAS EL…CTRICOS" |
-           cursos == "MEC¡NICA DE BANCO" |
-           cursos == "MECANIZADO CON M¡QUINAS DE CONTROL NUM…RICO" |
+           cursos == "MANTENIMIENTO DE MAQUINAS - EQUIPOS Y SISTEMAS EL√âCTRICOS" |
+           cursos == "MEC√ÅNICA DE BANCO" |
+           cursos == "MECANIZADO CON M√ÅQUINAS DE CONTROL NUM√âRICO" |
            cursos == "SOLDADURA INDUSTRIAL" |
-           cursos == "TORNEADO DE PIEZAS Y CONJUNTOS MEC¡NICOS" |
+           cursos == "TORNEADO DE PIEZAS Y CONJUNTOS MEC√ÅNICOS" |
            cursos == "TRAZADO DE OBRAS DE CONSTRUCCION")%>%
   summarise(enrollment_rollup_id,
             Nivel = nivel,
-            SecciÛn = seccion,
+            Secci√≥n = seccion,
             Nombre=nombre,
-            `Asignatura o mÛdulo`=cursos)
+            `Asignatura o m√≥dulo`=cursos)
 
 
 col_especialidad<-tickets%>%
   filter(Colegio== "Liceo Industrial de Nueva Imperial",
-         `Asignatura o mÛdulo`  == "ALBA—ILERÕAS ESTRUCTURALES Y NO ESTRUCTURALES" |
-           `Asignatura o mÛdulo`  == "AN¡LISIS DE MUESTRAS DE HORMIG”N - SUELOS Y MATERIALES" |
-           `Asignatura o mÛdulo`  == "AUTOMATIZACI”N DE SISTEMAS EL…CTRICOS INDUSTRIALES" |
-           `Asignatura o mÛdulo`  == "CARPINTERÕA ESTRUCTURAL (ABP)" |
-           `Asignatura o mÛdulo`  == "CUBICACION DE MATERIALES E INSUMOS" |
-           `Asignatura o mÛdulo`  == "ENFIERRADURA PARA ELEMENTOS ESTRUCTURALES" |
-           `Asignatura o mÛdulo`  == "FRESADO DE PIEZAS Y CONJUNTOS MEC¡NICOS - TALADRADO Y RECTIFICADO DE PIEZAS MEC¡NICAS" |
-           `Asignatura o mÛdulo`  == "INSTALACI”N DE MOTORES Y EQUIPOS DE CALEFACCI”N" |
-           `Asignatura o mÛdulo`  == "INSTALACI”N DE SISTEMAS DE CONTROL EL…CTRICO INDUSTRIAL" |
-           `Asignatura o mÛdulo`  == "INSTALACIONES EL…CTRICAS DOMICILIARIAS" |
-           `Asignatura o mÛdulo`  == "INSTALACIONES EL…CTRICAS INDUSTRIALES" |
-           `Asignatura o mÛdulo`  == "MANTENIMIENTO DE HERRAMIENTAS" |
-           `Asignatura o mÛdulo`  == "MANTENIMIENTO DE MAQUINAS - EQUIPOS Y SISTEMAS EL…CTRICOS" |
-           `Asignatura o mÛdulo`  == "MEC¡NICA DE BANCO" |
-           `Asignatura o mÛdulo`  == "MECANIZADO CON M¡QUINAS DE CONTROL NUM…RICO" |
-           `Asignatura o mÛdulo`  == "SOLDADURA INDUSTRIAL" |
-           `Asignatura o mÛdulo`  == "TORNEADO DE PIEZAS Y CONJUNTOS MEC¡NICOS" |
-           `Asignatura o mÛdulo`  == "TRAZADO DE OBRAS DE CONSTRUCCION")%>%
+         `Asignatura o m√≥dulo`  == "ALBA√ëILER√çAS ESTRUCTURALES Y NO ESTRUCTURALES" |
+           `Asignatura o m√≥dulo`  == "AN√ÅLISIS DE MUESTRAS DE HORMIG√ìN - SUELOS Y MATERIALES" |
+           `Asignatura o m√≥dulo`  == "AUTOMATIZACI√ìN DE SISTEMAS EL√âCTRICOS INDUSTRIALES" |
+           `Asignatura o m√≥dulo`  == "CARPINTER√çA ESTRUCTURAL (ABP)" |
+           `Asignatura o m√≥dulo`  == "CUBICACION DE MATERIALES E INSUMOS" |
+           `Asignatura o m√≥dulo`  == "ENFIERRADURA PARA ELEMENTOS ESTRUCTURALES" |
+           `Asignatura o m√≥dulo`  == "FRESADO DE PIEZAS Y CONJUNTOS MEC√ÅNICOS - TALADRADO Y RECTIFICADO DE PIEZAS MEC√ÅNICAS" |
+           `Asignatura o m√≥dulo`  == "INSTALACI√ìN DE MOTORES Y EQUIPOS DE CALEFACCI√ìN" |
+           `Asignatura o m√≥dulo`  == "INSTALACI√ìN DE SISTEMAS DE CONTROL EL√âCTRICO INDUSTRIAL" |
+           `Asignatura o m√≥dulo`  == "INSTALACIONES EL√âCTRICAS DOMICILIARIAS" |
+           `Asignatura o m√≥dulo`  == "INSTALACIONES EL√âCTRICAS INDUSTRIALES" |
+           `Asignatura o m√≥dulo`  == "MANTENIMIENTO DE HERRAMIENTAS" |
+           `Asignatura o m√≥dulo`  == "MANTENIMIENTO DE MAQUINAS - EQUIPOS Y SISTEMAS EL√âCTRICOS" |
+           `Asignatura o m√≥dulo`  == "MEC√ÅNICA DE BANCO" |
+           `Asignatura o m√≥dulo`  == "MECANIZADO CON M√ÅQUINAS DE CONTROL NUM√âRICO" |
+           `Asignatura o m√≥dulo`  == "SOLDADURA INDUSTRIAL" |
+           `Asignatura o m√≥dulo`  == "TORNEADO DE PIEZAS Y CONJUNTOS MEC√ÅNICOS" |
+           `Asignatura o m√≥dulo`  == "TRAZADO DE OBRAS DE CONSTRUCCION")%>%
   summarise(enrollment_rollup_id,
             n_ticket,p_logro)
 
@@ -1757,7 +1760,7 @@ col_especialidad<-dcast(col_especialidad,  enrollment_rollup_id~n_ticket, fun.ag
 col_especialidad<-left_join(bd_col_especialidad,col_especialidad,by = "enrollment_rollup_id", copi= FALSE)
 
 
-col_especialidad <- col_especialidad[order(col_especialidad$Nivel,col_especialidad$SecciÛn,col_especialidad$`Asignatura o mÛdulo`,col_especialidad$Nombre),]
+col_especialidad <- col_especialidad[order(col_especialidad$Nivel,col_especialidad$Secci√≥n,col_especialidad$`Asignatura o m√≥dulo`,col_especialidad$Nombre),]
 
 col_especialidad<-col_especialidad%>%
   select(-c(enrollment_rollup_id))
