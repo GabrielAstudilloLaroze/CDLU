@@ -1,0 +1,349 @@
+---
+title: "Reporte Segundo Prueba de Nivel 6, Segundo Semestre."
+subtitle: Comparación entre liceos.  
+output:
+  pdf_document:
+    toc: yes
+---
+
+
+
+``` {R echo=FALSE, include = FALSE}
+Ciclo<-"PDN 6"
+
+
+
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+
+load("~/Canvas Data/Reportes por liceo/bd_evaluaciones.Rdata")
+load("~/Canvas Data/Reportes por liceo/data_est.Rdata")
+
+
+data_est<-data_est%>%
+  rename(
+"Colegio" = "cuenta",
+"Nivel"="nivel",
+"Sección" = "seccion",
+"Estudiante" = "nombre",
+`Asignatura o módulo` ="cursos")
+
+
+etix<-data_est%>%
+  select(enrollment_rollup_id,Colegio,Nivel,Sección,Estudiante,`Asignatura o módulo`)
+
+
+bd_evaluaciones<-bd_evaluaciones%>%
+    select(-c(cuenta,nivel,seccion,nombre,cursos))%>%
+  left_join(etix, by="enrollment_rollup_id")
+
+pl<-bd_evaluaciones%>%
+  filter(evaluacion == Ciclo)%>%
+  group_by(enrollment_rollup_id)%>%
+  select(-c(quiz_id,account_id:evaluacion))%>%
+  summarise(p_logro=round(p_logro/points_possible,digits = 2),
+            p=1)
+
+
+bd<-left_join(data_est,pl,by = "enrollment_rollup_id")
+
+
+bd$p[is.na(bd$p)]<-0
+```
+
+
+\newpage
+
+# Lengua y Literatura.
+
+## Promedio por colegio.
+
+\centering
+Tabla 1: Promedio por colegio de participación y logro, PDN 6, Lengua y Literatura.
+```{r echo=FALSE, include=TRUE}  
+bd%>%
+  filter(`Asignatura o módulo`== "LENGUA Y LITERATURA")%>%
+  group_by(Colegio)%>%
+  summarise(`% Logro`=round(mean(p_logro,na.rm=TRUE), digits = 2),
+            `% de Participación`=round(mean(p, na.rm=TRUE), digits = 2))%>%
+  kable("pipe")
+
+bd%>%
+  filter(`Asignatura o módulo`== "LENGUA Y LITERATURA",
+         !(is.na(p_logro)))%>%
+  ggplot(aes(x=Colegio,y=p_logro))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Gráfico 1: % de logro en PDN \n Lengua y litartura por colegio")+
+  scale_y_continuous("% Logro")
+```
+
+\newpage
+\raggedright
+## Primer año.
+
+\centering
+
+Tabla 2: Primer año por colegio, promedio de participación y logro, PDN 6, Lengua y Literatura.
+```{r echo=FALSE, include=TRUE}  
+bd%>%
+  filter(`Asignatura o módulo`== "LENGUA Y LITERATURA",
+         Nivel == "I")%>%
+  group_by(Colegio)%>%
+  summarise(`% Logro`=round(mean(p_logro,na.rm=TRUE), digits = 2),
+            `% de Participación`=round(mean(p, na.rm=TRUE), digits = 2))%>%
+  kable("pipe")
+
+
+bd%>%
+  filter(`Asignatura o módulo`== "LENGUA Y LITERATURA",
+         Nivel == "I",
+         !(is.na(p_logro)))%>%
+  ggplot(aes(x=Colegio,y=p_logro))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Gráfico 2: % de logro en PDN \n Lengua y litartura por colegio",
+       subtitle = "Primer Año")+
+  scale_y_continuous("% Logro")
+```
+
+
+\newpage
+\raggedright
+## Segundo año.
+
+\centering
+
+Tabla 3: Segundo año por colegio, promedio de participación y logro, PDN 6, Lengua y Literatura.
+```{r echo=FALSE, include=TRUE}  
+bd%>%
+  filter(`Asignatura o módulo`== "LENGUA Y LITERATURA",
+         Nivel == "II")%>%
+  group_by(Colegio)%>%
+  summarise(`% Logro`=round(mean(p_logro,na.rm=TRUE), digits = 2),
+            `% de Participación`=round(mean(p, na.rm=TRUE), digits = 2))%>%
+  kable("pipe")
+
+bd%>%
+  filter(`Asignatura o módulo`== "LENGUA Y LITERATURA",
+         Nivel == "II",
+         !(is.na(p_logro)))%>%
+  ggplot(aes(x=Colegio,y=p_logro))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Gráfico 3: % de logro en PDN \n Lengua y litartura por colegio",
+       subtitle = "Segundo Año")+
+  scale_y_continuous("% Logro")
+```
+
+
+
+\newpage
+\raggedright
+## Tercer año.
+
+\centering
+
+Tabla 4: Tercer año por colegio, promedio de participación y logro, PDN 6, Lengua y Literatura.
+```{r echo=FALSE, include=TRUE} 
+bd%>%
+  filter(`Asignatura o módulo`== "LENGUA Y LITERATURA",
+         Nivel == "III")%>%
+  group_by(Colegio)%>%
+  summarise(`% Logro`=round(mean(p_logro,na.rm=TRUE), digits = 2),
+            `% de Participación`=round(mean(p, na.rm=TRUE), digits = 2))%>%
+  kable("pipe")
+
+
+bd%>%
+  filter(`Asignatura o módulo`== "LENGUA Y LITERATURA",
+         Nivel == "III",
+         !(is.na(p_logro)))%>%
+  ggplot(aes(x=Colegio,y=p_logro))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Gráfico 4: % de logro en PDN \n Lengua y litartura por colegio",
+       subtitle = "Tercer Año")+
+  scale_y_continuous("% Logro")
+```
+
+
+
+\newpage
+\raggedright
+## Cuarto año.
+
+\centering
+
+Tabla 5: Cuarto año por colegio, promedio de participación y logro, PDN 6, Lengua y Literatura.
+```{r echo=FALSE, include=TRUE} 
+bd%>%
+  filter(`Asignatura o módulo`== "LENGUA Y LITERATURA",
+         Nivel == "IV")%>%
+  group_by(Colegio)%>%
+  summarise(`% Logro`=round(mean(p_logro,na.rm=TRUE), digits = 2),
+            `% de Participación`=round(mean(p, na.rm=TRUE), digits = 2))%>%
+  kable("pipe")
+
+bd%>%
+  filter(`Asignatura o módulo`== "LENGUA Y LITERATURA",
+         Nivel == "IV",
+         !(is.na(p_logro)))%>%
+  ggplot(aes(x=Colegio,y=p_logro))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Gráfico 5: % de logro en PDN \n Lengua y litartura por colegio",
+       subtitle = "Cuarto Año")+
+  scale_y_continuous("% Logro")
+```
+
+
+\newpage
+\raggedright
+
+# Matemática.
+
+## Promedio por colegio.
+
+\centering
+Tabla 6: Promedio por colegio de participación y logro, PDN 6, Matemática.
+```{r echo=FALSE, include=TRUE}  
+bd%>%
+  filter(`Asignatura o módulo`== "MATEMÁTICA")%>%
+  group_by(Colegio)%>%
+  summarise(`% Logro`=round(mean(p_logro,na.rm=TRUE), digits = 2),
+            `% de Participación`=round(mean(p, na.rm=TRUE), digits = 2))%>%
+  kable("pipe")
+
+bd%>%
+  filter(`Asignatura o módulo`== "MATEMÁTICA",
+         !(is.na(p_logro)))%>%
+  ggplot(aes(x=Colegio,y=p_logro))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Gráfico 6: % de logro en PDN \n Matemática por colegio")+
+  scale_y_continuous("% Logro")
+```
+
+\newpage
+\raggedright
+## Primer año.
+
+\centering
+
+Tabla 7: Primer año por colegio, promedio de participación y logro, PDN 6, Matemática.
+```{r echo=FALSE, include=TRUE}  
+bd%>%
+  filter(`Asignatura o módulo`== "MATEMÁTICA",
+         Nivel == "I")%>%
+  group_by(Colegio)%>%
+  summarise(`% Logro`=round(mean(p_logro,na.rm=TRUE), digits = 2),
+            `% de Participación`=round(mean(p, na.rm=TRUE), digits = 2))%>%
+  kable("pipe")
+
+
+bd%>%
+  filter(`Asignatura o módulo`== "MATEMÁTICA",
+         Nivel == "I",
+         !(is.na(p_logro)))%>%
+  ggplot(aes(x=Colegio,y=p_logro))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Gráfico 7: % de logro en PDN \n Matemática por colegio",
+       subtitle = "Primer Año")+
+  scale_y_continuous("% Logro")
+```
+
+
+\newpage
+\raggedright
+## Segundo año.
+
+\centering
+
+Tabla 8: Segundo año por colegio, promedio de participación y logro, PDN 6, Matemática.
+```{r echo=FALSE, include=TRUE}  
+bd%>%
+  filter(`Asignatura o módulo`== "MATEMÁTICA",
+         Nivel == "II")%>%
+  group_by(Colegio)%>%
+  summarise(`% Logro`=round(mean(p_logro,na.rm=TRUE), digits = 2),
+            `% de Participación`=round(mean(p, na.rm=TRUE), digits = 2))%>%
+  kable("pipe")
+
+bd%>%
+  filter(`Asignatura o módulo`== "MATEMÁTICA",
+         Nivel == "II",
+         !(is.na(p_logro)))%>%
+  ggplot(aes(x=Colegio,y=p_logro))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Gráfico 8: % de logro en PDN \n Matemática por colegio",
+       subtitle = "Segundo Año")+
+  scale_y_continuous("% Logro")
+```
+
+
+
+\newpage
+\raggedright
+## Tercer año.
+
+\centering
+
+Tabla 9: Tercer año por colegio, promedio de participación y logro, PDN 6, Matemática.
+```{r echo=FALSE, include=TRUE} 
+bd%>%
+  filter(`Asignatura o módulo`== "MATEMÁTICA",
+         Nivel == "III")%>%
+  group_by(Colegio)%>%
+  summarise(`% Logro`=round(mean(p_logro,na.rm=TRUE), digits = 2),
+            `% de Participación`=round(mean(p, na.rm=TRUE), digits = 2))%>%
+  kable("pipe")
+
+
+bd%>%
+  filter(`Asignatura o módulo`== "MATEMÁTICA",
+         Nivel == "III",
+         !(is.na(p_logro)))%>%
+  ggplot(aes(x=Colegio,y=p_logro))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Gráfico 9: % de logro en PDN \n Matemática por colegio",
+       subtitle = "Tercer Año")+
+  scale_y_continuous("% Logro")
+```
+
+
+
+\newpage
+\raggedright
+## Cuarto año.
+
+\centering
+
+Tabla 10: Cuarto año por colegio, promedio de participación y logro, PDN 6, Matemática.
+```{r echo=FALSE, include=TRUE} 
+bd%>%
+  filter(`Asignatura o módulo`== "MATEMÁTICA",
+         Nivel == "IV")%>%
+  group_by(Colegio)%>%
+  summarise(`% Logro`=round(mean(p_logro,na.rm=TRUE), digits = 2),
+            `% de Participación`=round(mean(p, na.rm=TRUE), digits = 2))%>%
+  kable("pipe")
+
+bd%>%
+  filter(`Asignatura o módulo`== "MATEMÁTICA",
+         Nivel == "IV",
+         !(is.na(p_logro)))%>%
+  ggplot(aes(x=Colegio,y=p_logro))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Gráfico 10: % de logro en PDN \n Matemática por colegio",
+       subtitle = "Cuarto Año")+
+  scale_y_continuous("% Logro")
+```
+
+
+

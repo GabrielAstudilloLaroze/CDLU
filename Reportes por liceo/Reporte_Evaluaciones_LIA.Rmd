@@ -1,0 +1,677 @@
+---
+title: "Reporte Segundo Prueba de Nivel 6, Segundo Semestre."
+subtitle: Liceo Industrial de Angol.
+output:
+  pdf_document:
+    toc: yes
+---
+
+\newpage
+
+``` {R echo=FALSE, include = FALSE}
+colegio<-"Liceo Industrial de Angol"
+Ciclo<-"PDN 6"
+
+
+
+
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+
+
+
+load("~/Canvas Data/Reportes por liceo/bd_evaluaciones.Rdata")
+load("~/Canvas Data/Reportes por liceo/data_est.Rdata")
+
+
+data_est<-data_est%>%
+  rename(
+"Colegio" = "cuenta",
+"Nivel"="nivel",
+"Sección" = "seccion",
+"Estudiante" = "nombre",
+`Asignatura o módulo` ="cursos")
+
+
+etix<-data_est%>%
+  select(enrollment_rollup_id,Colegio,Nivel,Sección,Estudiante,`Asignatura o módulo`)
+
+
+bd_evaluaciones<-bd_evaluaciones%>%
+    select(-c(cuenta,nivel,seccion,nombre,cursos))%>%
+  left_join(etix, by="enrollment_rollup_id")
+
+
+col<-data_est%>%
+  filter(Colegio == colegio)
+
+
+pr_col<-bd_evaluaciones%>%
+  filter(Colegio == Colegio,
+         evaluacion == Ciclo)
+```
+
+
+
+## Lengua y Literatura.
+
+``` {R echo=FALSE, include = FALSE}
+bd_lyl<-col%>%
+  filter(`Asignatura o módulo` == "LENGUA Y LITERATURA")%>%
+  select(Nivel,Sección,Estudiante,`Asignatura o módulo`)
+
+pr_lyl<-pr_col%>%
+  filter(`Asignatura o módulo` == "LENGUA Y LITERATURA")%>%
+  group_by(Estudiante,p_logro)%>%
+  summarise(p=1)
+           
+
+pr_lyl<-left_join(bd_lyl,pr_lyl,by = "Estudiante", copi= FALSE)
+
+pr_lyl$p[is.na(pr_lyl$p)]<-0
+
+
+part_l0<-pr_lyl%>%
+  group_by(`Asignatura o módulo`)%>%
+  summarise(`% de Participación` = round(mean(p)*100, digits = 2),
+            `% Logro` = round(mean(p_logro/40, na.rm = TRUE)*100, digits = 2))
+
+part_l1<-pr_lyl%>%
+  group_by(Nivel)%>%
+  summarise(`% de Participación` = round(mean(p)*100, digits = 2),
+            `% Logro` = round(mean(p_logro/40, na.rm = TRUE)*100, digits = 2))
+```
+  
+  
+\centering
+Tabla 1: Promedio de Participación y Logro en el establecimiento, Prueba de Nivel Lengua y Literatura.
+``` {R echo=FALSE, include = TRUE}
+part_l0%>%select(-c(`Asignatura o módulo`))%>%
+kable("pipe")
+```
+
+
+Tabla 2: Promedio de Participación y Logro por nivel, Prueba de Nivel Lengua y Literatura.
+``` {R echo=FALSE, include = TRUE}
+kable(part_l1,"pipe")
+```
+
+\raggedright 
+``` {R echo=FALSE, include = FALSE}
+part_l1.1<-pr_lyl%>%
+  group_by(Nivel)%>%
+  filter(!(is.na(p_logro)))%>%
+  summarise(`% Logro` = (p_logro/40)*100)
+```
+
+
+``` {R echo=FALSE, include = TRUE}
+  ggplot(part_l1.1, aes(Nivel,`% Logro`))+
+  geom_boxplot()+
+  labs(title = "Gráfico 1: Resultados Prueba de Nivel Lengua y Literatura por Nivel")+
+  coord_flip()
+  
+```
+
+
+\newpage
+## Matemática.
+
+``` {R echo=FALSE, include = FALSE}
+bd_mat<-col%>%
+  filter(`Asignatura o módulo` == "MATEMÁTICA")%>%
+  select(Nivel,Sección,Estudiante,`Asignatura o módulo`)
+
+pr_mat<-pr_col%>%
+  filter(`Asignatura o módulo` == "MATEMÁTICA")%>%
+  group_by(Estudiante,p_logro)%>%
+  summarise(p=1)
+           
+
+pr_mat<-left_join(bd_mat,pr_mat,by = "Estudiante", copi= FALSE)
+
+pr_mat$p[is.na(pr_mat$p)]<-0
+
+
+part_m0<-pr_mat%>%
+  group_by(`Asignatura o módulo`)%>%
+  summarise(`% de Participación` = round(mean(p)*100, digits = 2),
+            `% Logro` = round(mean(p_logro/40, na.rm = TRUE)*100, digits = 2))
+
+part_m1<-pr_mat%>%
+  group_by(Nivel)%>%
+  summarise(`% de Participación` = round(mean(p)*100, digits = 2),
+            `% Logro` = round(mean(p_logro/40, na.rm = TRUE)*100, digits = 2))
+```
+  
+  
+\centering
+Tabla 3: Promedio de Participación y Logro en el establecimiento, Prueba de Nivel Matemática.
+``` {R echo=FALSE, include = TRUE}
+part_m0%>%select(-c(`Asignatura o módulo`))%>%
+kable("pipe")
+```
+
+
+Tabla 4: Promedio de Participación y Logro por nivel, Prueba de Nivel Matemática.
+``` {R echo=FALSE, include = TRUE}
+kable(part_m1,"pipe")
+```
+
+\raggedright 
+``` {R echo=FALSE, include = FALSE}
+part_m1.1<-pr_mat%>%
+  group_by(Nivel)%>%
+  filter(!(is.na(p_logro)))%>%
+  summarise(`% Logro` = (p_logro/40)*100)
+```
+
+
+``` {R echo=FALSE, include = TRUE}
+  ggplot(part_m1.1, aes(Nivel,`% Logro`))+
+  geom_boxplot()+
+  labs(title = "Gráfico 2: Resultados Prueba de Nivel Matemática por Nivel")+
+  coord_flip()
+  
+```
+
+
+
+  
+``` {R echo=FALSE, include=FALSE}
+## Análisis por sección.
+
+
+bd_sec<-col%>%
+  filter(`Asignatura o módulo` == "MATEMÁTICA" | `Asignatura o módulo` == "LENGUA Y LITERATURA")%>%
+  select(enrollment_rollup_id,Nivel,Sección,`Asignatura o módulo`)
+
+pr_sec<-pr_col%>%
+  filter(`Asignatura o módulo` == "MATEMÁTICA" | `Asignatura o módulo` == "LENGUA Y LITERATURA")%>%
+  group_by(enrollment_rollup_id,p_logro)%>%
+  summarise(p=1)
+           
+
+pr_sec<-left_join(bd_sec,pr_sec,by = "enrollment_rollup_id", copi= FALSE)
+
+pr_sec$p[is.na(pr_sec$p)]<-0
+
+
+
+```
+
+\newpage
+\raggedright 
+# Otras asignaturas del plan general.
+
+## Primer año.
+
+``` {R echo=FALSE, include = FALSE}
+bd_fg<-col%>%
+  filter(Nivel == "I", !(`Asignatura o módulo` == "MATEMÁTICA" | `Asignatura o módulo` == "LENGUA Y LITERATURA"))%>%
+  select(enrollment_rollup_id,Nivel,Sección,`Asignatura o módulo`)
+
+pr_fg<-pr_col%>%
+  filter(Nivel == "I", !(`Asignatura o módulo` == "MATEMÁTICA" | `Asignatura o módulo` == "LENGUA Y LITERATURA"))%>%
+  group_by(enrollment_rollup_id)%>%
+  summarise(`% Logro` =(p_logro/as.numeric(points_possible)),
+            p=1)
+           
+
+pr_fg<-left_join(bd_fg,pr_fg,by = "enrollment_rollup_id", copi= FALSE)
+
+pr_fg$p[is.na(pr_fg$p)]<-0
+
+
+part_fg1<-pr_fg%>%
+  filter(!(`Asignatura o módulo` == "TECNOLOGÍA" |
+            `Asignatura o módulo` == "MÚSICA" |
+             `Asignatura o módulo` == "EDUCACIÓN FÍSICA" |
+             `Asignatura o módulo` ==  "ARTES VISUALES"))%>%
+  group_by(`Asignatura o módulo`)%>%
+  summarise(`% de Participación` = round(mean(p)*100, digits = 2),
+            `% Logro` = round(mean(`% Logro`, na.rm = TRUE)*100, digits = 2))
+```
+
+\centering 
+Tabla 5:   % de Participación y logro en prueba de nivel 5. Primer año, Formación General.
+``` {R echo=FALSE, include = TRUE}
+kable(part_fg1,"pipe")
+```
+
+
+``` {R echo=FALSE, include = FALSE}
+part_fg1.1<-pr_fg%>%
+  filter(!(`Asignatura o módulo` == "TECNOLOGÍA" |
+            `Asignatura o módulo` == "MÚSICA" |
+             `Asignatura o módulo` == "EDUCACIÓN FÍSICA" |
+             `Asignatura o módulo` ==  "ARTES VISUALES"))%>%
+  group_by(`Asignatura o módulo`)%>%
+  filter(!(is.na(`% Logro`)))%>%
+  summarise(`% Logro`)
+```
+
+``` {R echo=FALSE, include = TRUE}
+  ggplot(part_fg1.1, aes(`Asignatura o módulo`,`% Logro`))+
+  geom_boxplot()+
+  labs(title = "Gráfico 3: Resultados Prueba de Nivel Primer Año",
+       subtitle = "Por Asignatura de Formación General.")+
+  coord_flip()
+  
+```
+\raggedright 
+\newpage
+  
+## Segundo año.
+
+``` {R echo=FALSE, include = FALSE}
+bd_fg<-col%>%
+  filter(Nivel == "II", !(`Asignatura o módulo` == "MATEMÁTICA" | `Asignatura o módulo` == "LENGUA Y LITERATURA"))%>%
+  select(enrollment_rollup_id,Nivel,Sección,`Asignatura o módulo`)
+
+pr_fg<-pr_col%>%
+  filter(Nivel == "II", !(`Asignatura o módulo` == "MATEMÁTICA" | `Asignatura o módulo` == "LENGUA Y LITERATURA"))%>%
+  group_by(enrollment_rollup_id)%>%
+  summarise(`% Logro` =(p_logro/as.numeric(points_possible)),
+            p=1)
+           
+
+pr_fg<-left_join(bd_fg,pr_fg,by = "enrollment_rollup_id", copi= FALSE)
+
+pr_fg$p[is.na(pr_fg$p)]<-0
+
+
+part_fg1<-pr_fg%>%
+  filter(!(`Asignatura o módulo` == "TECNOLOGÍA" |
+            `Asignatura o módulo` == "MÚSICA" |
+             `Asignatura o módulo` == "EDUCACIÓN FÍSICA" |
+             `Asignatura o módulo` ==  "ARTES VISUALES"))%>%
+  group_by(`Asignatura o módulo`)%>%
+  summarise(`% de Participación` = round(mean(p)*100, digits = 2),
+            `% Logro` = round(mean(`% Logro`, na.rm = TRUE)*100, digits = 2))
+```
+\centering  
+Tabla 6:   % de Participación y logro en prueba de nivel 5. Primer año, Formación General.
+``` {R echo=FALSE, include = TRUE}
+kable(part_fg1,"pipe")
+```
+
+
+``` {R echo=FALSE, include = FALSE}
+part_fg1.1<-pr_fg%>%
+  filter(!(`Asignatura o módulo` == "TECNOLOGÍA" |
+            `Asignatura o módulo` == "MÚSICA" |
+             `Asignatura o módulo` == "EDUCACIÓN FÍSICA" |
+             `Asignatura o módulo` ==  "ARTES VISUALES"))%>%
+  group_by(`Asignatura o módulo`)%>%
+  filter(!(is.na(`% Logro`)))%>%
+  summarise(`% Logro`)
+```
+
+``` {R echo=FALSE, include = TRUE}
+  ggplot(part_fg1.1, aes(`Asignatura o módulo`,`% Logro`))+
+  geom_boxplot()+
+  labs(title = "Gráfico 4: Resultados Prueba de Nivel Segundo Año",
+       subtitle = "Por Asignatura de Formación General.")+
+  coord_flip()
+  
+```
+\raggedright 
+\newpage  
+
+## Tercer año.
+
+``` {R echo=FALSE, include = FALSE}
+bd_fg<-col%>%
+  filter(Nivel == "III", `Asignatura o módulo` == "INGLÉS" |
+           `Asignatura o módulo` == "FORMACIÓN CIUDADANA" |
+           `Asignatura o módulo` == "FILOSOFÍA" |
+           `Asignatura o módulo` == "EMPRENDIMIENTO" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANIA" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANÍA")%>%
+  select(enrollment_rollup_id,Nivel,Sección,`Asignatura o módulo`)
+
+pr_fg<-pr_col%>%
+  filter(Nivel == "III", `Asignatura o módulo` == "INGLÉS" |
+           `Asignatura o módulo` == "FORMACIÓN CIUDADANA" |
+           `Asignatura o módulo` == "FILOSOFÍA" |
+           `Asignatura o módulo` == "EMPRENDIMIENTO" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANIA" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANÍA")%>%
+  group_by(enrollment_rollup_id)%>%
+  summarise(`% Logro` =(p_logro/as.numeric(points_possible)),
+            p=1)
+           
+
+pr_fg<-left_join(bd_fg,pr_fg,by = "enrollment_rollup_id", copi= FALSE)
+
+pr_fg$p[is.na(pr_fg$p)]<-0
+
+
+part_fg1<-pr_fg%>%
+   filter(`Asignatura o módulo` == "INGLÉS" |
+           `Asignatura o módulo` == "FORMACIÓN CIUDADANA" |
+           `Asignatura o módulo` == "FILOSOFÍA" |
+           `Asignatura o módulo` == "EMPRENDIMIENTO" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANIA" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANÍA")%>%
+  group_by(`Asignatura o módulo`)%>%
+  summarise(`% de Participación` = round(mean(p)*100, digits = 2),
+            `% Logro` = round(mean(`% Logro`, na.rm = TRUE)*100, digits = 2))
+
+
+```
+\centering  
+Tabla 7:   % de Participación y logro en prueba de nivel. Tercer año, Formación General.
+``` {R echo=FALSE, include = TRUE}
+kable(part_fg1,"pipe")
+```
+
+
+``` {R echo=FALSE, include = FALSE}
+part_fg1.1<-pr_fg%>%
+    filter(`Asignatura o módulo` == "INGLÉS" |
+           `Asignatura o módulo` == "FORMACIÓN CIUDADANA" |
+           `Asignatura o módulo` == "FILOSOFÍA" |
+           `Asignatura o módulo` == "EMPRENDIMIENTO" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANIA" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANÍA")%>%
+  group_by(`Asignatura o módulo`)%>%
+  filter(!(is.na(`% Logro`)))%>%
+  summarise(`% Logro`)
+```
+
+``` {R echo=FALSE, include = TRUE}
+  ggplot(part_fg1.1, aes(`Asignatura o módulo`,`% Logro`))+
+  geom_boxplot()+
+  labs(title = "Gráfico 5: Resultados Prueba de Nivel Tercer Año",
+       subtitle = "Por Asignatura de Formación General.")+
+  coord_flip()
+  
+```
+
+
+
+\raggedright 
+\newpage  
+
+## Cuarto año.
+``` {R echo=FALSE, include = FALSE}
+bd_fd<-col%>%
+  filter(Nivel == "IV", `Asignatura o módulo` == "INGLÉS" |
+           `Asignatura o módulo` == "FORMACIÓN CIUDADANA" |
+           `Asignatura o módulo` == "FILOSOFÍA" |
+           `Asignatura o módulo` == "EMPRENDIMIENTO" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANIA" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANÍA")%>%
+  select(enrollment_rollup_id,Nivel,Sección,`Asignatura o módulo`)
+
+pr_fd<-pr_col%>%
+  filter(Nivel == "IV", `Asignatura o módulo` == "INGLÉS" |
+           `Asignatura o módulo` == "FORMACIÓN CIUDADANA" |
+           `Asignatura o módulo` == "FILOSOFÍA" |
+           `Asignatura o módulo` == "EMPRENDIMIENTO" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANIA" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANÍA")%>%
+  group_by(enrollment_rollup_id)%>%
+  summarise(`% Logro` =(p_logro/as.numeric(points_possible)),
+            p=1)
+           
+
+pr_fd<-left_join(bd_fd,pr_fd,by = "enrollment_rollup_id", copi= FALSE)
+
+pr_fd$p[is.na(pr_fd$p)]<-0
+
+
+part_fd1<-pr_fd%>%
+   filter(`Asignatura o módulo` == "INGLÉS" |
+           `Asignatura o módulo` == "FORMACIÓN CIUDADANA" |
+           `Asignatura o módulo` == "FILOSOFÍA" |
+           `Asignatura o módulo` == "EMPRENDIMIENTO" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANIA" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANÍA")%>%
+  group_by(`Asignatura o módulo`)%>%
+  summarise(`% de Participación` = round(mean(p)*100, digits = 2),
+            `% Logro` = round(mean(`% Logro`, na.rm = TRUE)*100, digits = 2))
+
+
+
+
+
+
+
+
+
+
+
+
+```
+\centering  
+Tabla 8:   % de Participación y logro en prueba de nivel. Cuarto año, Formación General.
+``` {R echo=FALSE, include = TRUE}
+kable(part_fd1,"pipe")
+```
+
+
+``` {R echo=FALSE, include = FALSE}
+part_fd1.1<-pr_fd%>%
+    filter(`Asignatura o módulo` == "INGLÉS" |
+           `Asignatura o módulo` == "FORMACIÓN CIUDADANA" |
+           `Asignatura o módulo` == "FILOSOFÍA" |
+           `Asignatura o módulo` == "EMPRENDIMIENTO" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANIA" |
+           `Asignatura o módulo` == "CIENCIAS PARA LA CIUDADANÍA")%>%
+  group_by(`Asignatura o módulo`)%>%
+  filter(!(is.na(`% Logro`)))%>%
+  summarise(`% Logro`)
+```
+
+``` {R echo=FALSE, include = TRUE}
+  ggplot(part_fd1.1, aes(`Asignatura o módulo`,`% Logro`))+
+  geom_boxplot()+
+  labs(title = "Gráfico 6: Resultados Prueba de Nivel Cuarto Año",
+       subtitle = "Por Asignatura de Formación General.")+
+  coord_flip()
+  
+```
+\raggedright   
+\newpage    
+
+# Formación de especialidad.
+  
+  
+## Tercer año.
+``` {R echo=FALSE, include = FALSE}
+bd_fd<-col%>%
+  filter(Nivel == "III",  
+           `Asignatura o módulo` == "AJUSTE DE MOTORES" |
+`Asignatura o módulo` == "AUTOMATIZACIÓN DE SISTEMAS ELÉCTRICOS INDUSTRIALES" |                                   
+`Asignatura o módulo` == "FRESADO DE PIEZAS Y CONJUNTOS MECÁNICOS - TALADRADO Y RECTIFICADO DE PIEZAS MECÁNICAS" |
+`Asignatura o módulo` == "INSTALACIÓN DE MOTORES Y EQUIPOS DE CALEFACCIÓN" |                                      
+`Asignatura o módulo` == "INSTALACIÓN DE SISTEMAS DE CONTROL ELÉCTRICO INDUSTRIAL" |                              
+`Asignatura o módulo` == "INSTALACIONES ELÉCTRICAS DOMICILIARIAS" |                                               
+`Asignatura o módulo` == "INSTALACIONES ELÉCTRICAS INDUSTRIALES" |                                                
+`Asignatura o módulo` == "MANEJO DE RESIDUOS Y DESECHOS AUTOMOTRICES" |
+`Asignatura o módulo` == "MANTENIMIENTO DE HERRAMIENTAS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS DE DIRECCIÓN Y SUSPENSIÓN" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS DE TRANSMISIÓN Y FRENADO" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS ELÉCTRICOS Y ELECTRÓNICOS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE MÁQUINAS - EQUIPOS Y SISTEMAS ELÉCTRICOS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE MOTORES" |
+`Asignatura o módulo` == "MECÁNICA DE BANCO" |
+`Asignatura o módulo` == "MECANIZADO CON MÁQUINAS DE CONTROL NUMÉRICO" |
+`Asignatura o módulo` == "SOLDADURA INDUSTRIAL" |
+`Asignatura o módulo` == "TORNEADO DE PIEZAS Y CONJUNTOS MECÁNICOS")%>%
+  select(enrollment_rollup_id,Nivel,Sección,`Asignatura o módulo`)
+
+pr_fd<-pr_col%>%
+  filter(Nivel == "III",
+           `Asignatura o módulo` == "AJUSTE DE MOTORES" |
+`Asignatura o módulo` == "AUTOMATIZACIÓN DE SISTEMAS ELÉCTRICOS INDUSTRIALES" |                                   
+`Asignatura o módulo` == "FRESADO DE PIEZAS Y CONJUNTOS MECÁNICOS - TALADRADO Y RECTIFICADO DE PIEZAS MECÁNICAS" |
+`Asignatura o módulo` == "INSTALACIÓN DE MOTORES Y EQUIPOS DE CALEFACCIÓN" |                                      
+`Asignatura o módulo` == "INSTALACIÓN DE SISTEMAS DE CONTROL ELÉCTRICO INDUSTRIAL" |                              
+`Asignatura o módulo` == "INSTALACIONES ELÉCTRICAS DOMICILIARIAS" |                                               
+`Asignatura o módulo` == "INSTALACIONES ELÉCTRICAS INDUSTRIALES" |                                                
+`Asignatura o módulo` == "MANEJO DE RESIDUOS Y DESECHOS AUTOMOTRICES" |
+`Asignatura o módulo` == "MANTENIMIENTO DE HERRAMIENTAS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS DE DIRECCIÓN Y SUSPENSIÓN" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS DE TRANSMISIÓN Y FRENADO" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS ELÉCTRICOS Y ELECTRÓNICOS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE MÁQUINAS - EQUIPOS Y SISTEMAS ELÉCTRICOS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE MOTORES" |
+`Asignatura o módulo` == "MECÁNICA DE BANCO" |
+`Asignatura o módulo` == "MECANIZADO CON MÁQUINAS DE CONTROL NUMÉRICO" |
+`Asignatura o módulo` == "SOLDADURA INDUSTRIAL" |
+`Asignatura o módulo` == "TORNEADO DE PIEZAS Y CONJUNTOS MECÁNICOS")%>%
+  group_by(enrollment_rollup_id)%>%
+  summarise(`% Logro` =(p_logro/as.numeric(points_possible)),
+            p=1)
+
+
+
+
+
+pr_fd<-left_join(bd_fd,pr_fd,by = "enrollment_rollup_id", copi= FALSE)
+
+pr_fd$p[is.na(pr_fd$p)]<-0
+
+library(stringr)      
+pr_fd$`Asignatura o módulo`<-str_replace_all(pr_fd$`Asignatura o módulo`, "FRESADO DE PIEZAS Y CONJUNTOS MECÁNICOS - TALADRADO Y RECTIFICADO DE PIEZAS MECÁNICAS", "FRESADO + TALADRADO")
+pr_fd$`Asignatura o módulo`<-str_replace_all(pr_fd$`Asignatura o módulo`, "INSTALACIÓN DE SISTEMAS DE CONTROL ELÉCTRICO INDUSTRIAL", "SIST. C. ELEC. IND")
+pr_fd$`Asignatura o módulo`<-str_replace_all(pr_fd$`Asignatura o módulo`, "MANTENIMIENTO DE MÁQUINAS - EQUIPOS Y SISTEMAS ELÉCTRICOS", "MANT. MAQ + EQ. SIS. ELETRÓNICOS")
+
+pr_fd$`Asignatura o módulo`<-str_replace_all(pr_fd$`Asignatura o módulo`, "MANTENIMIENTO DE LOS SISTEMAS", "M. SIS.")
+
+
+part_fd1<-pr_fd%>%
+   filter()%>%
+  group_by(`Asignatura o módulo`)%>%
+  summarise(`% de Participación` = round(mean(p)*100, digits = 2),
+            `% Logro` = round(mean(`% Logro`, na.rm = TRUE)*100, digits = 2))
+```
+
+\centering
+Tabla 9: % de Participación y logro en prueba de nivel 5. Tercer año, Formación de Especialidad.
+``` {R echo=FALSE, include = TRUE}
+kable(part_fd1,"pipe")
+```
+
+
+
+``` {R echo=FALSE, include = FALSE}
+part_fd1.1<-pr_fd%>%
+  group_by(`Asignatura o módulo`)%>%
+  filter(!(is.na(`% Logro`)))%>%
+  summarise(`% Logro`)
+```
+
+``` {R echo=FALSE, include = TRUE}
+
+
+  ggplot(part_fd1.1, aes(`Asignatura o módulo`,`% Logro`))+
+  geom_boxplot()+
+  labs(title = "Gráfico 7: Resultados Prueba de Nivel\nTercer Año",
+       subtitle = "Por módulo de Formación de Especialidad")+
+  coord_flip()
+  
+```
+\raggedright 
+\newpage  
+
+## Cuarto año.
+``` {R echo=FALSE, include = FALSE}
+bd_fd<-col%>%
+  filter(Nivel == "IV",  
+           `Asignatura o módulo` == "AJUSTE DE MOTORES" |
+`Asignatura o módulo` == "AUTOMATIZACIÓN DE SISTEMAS ELÉCTRICOS INDUSTRIALES" |                                   
+`Asignatura o módulo` == "FRESADO DE PIEZAS Y CONJUNTOS MECÁNICOS - TALADRADO Y RECTIFICADO DE PIEZAS MECÁNICAS" |
+`Asignatura o módulo` == "INSTALACIÓN DE MOTORES Y EQUIPOS DE CALEFACCIÓN" |                                      
+`Asignatura o módulo` == "INSTALACIÓN DE SISTEMAS DE CONTROL ELÉCTRICO INDUSTRIAL" |                              
+`Asignatura o módulo` == "INSTALACIONES ELÉCTRICAS DOMICILIARIAS" |                                               
+`Asignatura o módulo` == "INSTALACIONES ELÉCTRICAS INDUSTRIALES" |                                                
+`Asignatura o módulo` == "MANEJO DE RESIDUOS Y DESECHOS AUTOMOTRICES" |
+`Asignatura o módulo` == "MANTENIMIENTO DE HERRAMIENTAS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS DE DIRECCIÓN Y SUSPENSIÓN" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS DE TRANSMISIÓN Y FRENADO" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS ELÉCTRICOS Y ELECTRÓNICOS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE MÁQUINAS - EQUIPOS Y SISTEMAS ELÉCTRICOS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE MOTORES" |
+`Asignatura o módulo` == "MECÁNICA DE BANCO" |
+`Asignatura o módulo` == "MECANIZADO CON MÁQUINAS DE CONTROL NUMÉRICO" |
+`Asignatura o módulo` == "SOLDADURA INDUSTRIAL" |
+`Asignatura o módulo` == "TORNEADO DE PIEZAS Y CONJUNTOS MECÁNICOS")%>%
+  select(enrollment_rollup_id,Nivel,Sección,`Asignatura o módulo`)
+
+pr_fd<-pr_col%>%
+  filter(Nivel == "IV",
+           `Asignatura o módulo` == "AJUSTE DE MOTORES" |
+`Asignatura o módulo` == "AUTOMATIZACIÓN DE SISTEMAS ELÉCTRICOS INDUSTRIALES" |                                   
+`Asignatura o módulo` == "FRESADO DE PIEZAS Y CONJUNTOS MECÁNICOS - TALADRADO Y RECTIFICADO DE PIEZAS MECÁNICAS" |
+`Asignatura o módulo` == "INSTALACIÓN DE MOTORES Y EQUIPOS DE CALEFACCIÓN" |                                      
+`Asignatura o módulo` == "INSTALACIÓN DE SISTEMAS DE CONTROL ELÉCTRICO INDUSTRIAL" |                              
+`Asignatura o módulo` == "INSTALACIONES ELÉCTRICAS DOMICILIARIAS" |                                               
+`Asignatura o módulo` == "INSTALACIONES ELÉCTRICAS INDUSTRIALES" |                                                
+`Asignatura o módulo` == "MANEJO DE RESIDUOS Y DESECHOS AUTOMOTRICES" |
+`Asignatura o módulo` == "MANTENIMIENTO DE HERRAMIENTAS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS DE DIRECCIÓN Y SUSPENSIÓN" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS DE TRANSMISIÓN Y FRENADO" |
+`Asignatura o módulo` == "MANTENIMIENTO DE LOS SISTEMAS ELÉCTRICOS Y ELECTRÓNICOS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE MÁQUINAS - EQUIPOS Y SISTEMAS ELÉCTRICOS" |
+`Asignatura o módulo` == "MANTENIMIENTO DE MOTORES" |
+`Asignatura o módulo` == "MECÁNICA DE BANCO" |
+`Asignatura o módulo` == "MECANIZADO CON MÁQUINAS DE CONTROL NUMÉRICO" |
+`Asignatura o módulo` == "SOLDADURA INDUSTRIAL" |
+`Asignatura o módulo` == "TORNEADO DE PIEZAS Y CONJUNTOS MECÁNICOS")%>%
+  group_by(enrollment_rollup_id)%>%
+  summarise(`% Logro` =(p_logro/as.numeric(points_possible)),
+            p=1)
+
+
+
+
+
+pr_fd<-left_join(bd_fd,pr_fd,by = "enrollment_rollup_id", copi= FALSE)
+
+pr_fd$p[is.na(pr_fd$p)]<-0
+
+      
+pr_fd$`Asignatura o módulo`<-str_replace_all(pr_fd$`Asignatura o módulo`, "FRESADO DE PIEZAS Y CONJUNTOS MECÁNICOS - TALADRADO Y RECTIFICADO DE PIEZAS MECÁNICAS", "FRESADO + TALADRADO")
+pr_fd$`Asignatura o módulo`<-str_replace_all(pr_fd$`Asignatura o módulo`, "INSTALACIÓN DE SISTEMAS DE CONTROL ELÉCTRICO INDUSTRIAL", "SIST. C. ELEC. IND")
+pr_fd$`Asignatura o módulo`<-str_replace_all(pr_fd$`Asignatura o módulo`, "MANTENIMIENTO DE MÁQUINAS - EQUIPOS Y SISTEMAS ELÉCTRICOS", "MANT. MAQ + EQ. SIS. ELETRÓNICOS")
+
+pr_fd$`Asignatura o módulo`<-str_replace_all(pr_fd$`Asignatura o módulo`, "MANTENIMIENTO DE LOS SISTEMAS", "M. SIS.")
+
+
+part_fd1<-pr_fd%>%
+   filter()%>%
+  group_by(`Asignatura o módulo`)%>%
+  summarise(`% de Participación` = round(mean(p)*100, digits = 2),
+            `% Logro` = round(mean(`% Logro`, na.rm = TRUE)*100, digits = 2))
+```
+
+\centering
+Tabla 10: % de Participación y logro en prueba de nivel 5. Cuarto año, Formación de Especialidad
+``` {R echo=FALSE, include = TRUE}
+kable(part_fd1,"pipe")
+```
+
+
+
+``` {R echo=FALSE, include = FALSE}
+part_fd1.1<-pr_fd%>%
+  group_by(`Asignatura o módulo`)%>%
+  filter(!(is.na(`% Logro`)))%>%
+  summarise(`% Logro`)
+```
+
+``` {R echo=FALSE, include = TRUE}
+  ggplot(part_fd1.1, aes(`Asignatura o módulo`,`% Logro`))+
+  geom_boxplot()+
+  labs(title = "Gráfico 8: Resultados Prueba de Nivel\n Cuarto Año",
+       subtitle = "Por módulo de Formación de Especialidad")+
+  coord_flip()
+  
+```
