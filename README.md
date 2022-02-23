@@ -69,13 +69,13 @@ Las googlesheets de destino son diferentes a las de los tickets de salida, por l
 
 Exporta informes desde Rmarkdown a los que hay que hacerle muy pocas modificaciones para que salgan.
 
-Se necesita un paquete extra: ```KableExtra```
+Se necesita un paquete más: ```KableExtra```
 
 ```{r}
 install.packages("kableExtra")
 ```
 
-También se necesita instalar un motor de Latex para R como ```tinytex```.
+También se necesita instalar un motor de Latex para R como ```tinytex```, que permite exportar desde Rmarkdown a PDF.
 
 Hay un archivo Rmd que recoge las particularidades de cada colegio, más uno que corresponde a informe comparativo entre colegios.
 
