@@ -19,3 +19,5 @@ install.packages("tidyverse")
 install.packages("googlesheets4")
 install.packages("reshape2")
 ```
+5. Crear un nuevo archivo nivel.csv que asocie los cursos del periodo actual a niveles, de acuerdo al formato del archivo aquí disponible:  
+  Archivo debe contener dos columnas, en una el course_id, y en la otra los niveles: ```"1","2","3","4","5","6",7","8","I","II","III","IV"```.
