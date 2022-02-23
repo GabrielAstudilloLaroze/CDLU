@@ -46,7 +46,10 @@ La organización de los datos se divide en:
 1. Limpieza de datos de estudiantes.  
 2. Filtrar solo tickets de salida.  
 3. Organizar los tickets por orden de publicación dentro cada asignatura.  
-4. Cálculo de indicadores de resumen por estudiante-asignatura: Número de tickets publicados por asignatura, número de tickets contestados por el estudiante, % de participación, % de logro promedio en los tickets de la asignatura.  
-
+4. Cálculo de indicadores de resumen por estudiante-asignatura: Número de tickets publicados por asignatura, número de tickets contestados por el estudiante, % de participación, % de logro promedio en los tickets de la asignatura. 
+5. Filtrar los datos por cada asignatura -dentro de cada colegio- y pivotear a formato long, para subirlos con la siguiente estructura:  
+  Un archivo googlesheet por colegio.  
+  Una hoja distinta para cada asignatura, en la cual se incorporan todos los niveles y secciones que corresponden.  
+  Cada columna corresponde al orden de publicación
 
 
