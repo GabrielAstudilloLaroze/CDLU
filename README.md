@@ -21,3 +21,11 @@ install.packages("reshape2")
 ```
 5. Crear un nuevo archivo nivel.csv que asocie los cursos del periodo actual a niveles, de acuerdo al formato del archivo aquí disponible:  
   Archivo debe contener dos columnas, en una el course_id, y en la otra los niveles: ```"1","2","3","4","5","6",7","8","I","II","III","IV"```.
+
+6. Configurar interacción ```googlesheets4```:  
+```{r}
+library(googlesheets4)
+gs4_auth()
+```
+Se va a abrir una pestaña en el navegador, para autorizar permisos desde una cuenta de google. Seleccionar la cuenta que se va a utilizar y dar **todos** los permisos solicitados y cerrar.
+
