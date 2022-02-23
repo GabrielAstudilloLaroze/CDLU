@@ -500,10 +500,10 @@ evaluaciones$orden[(evaluaciones$quiz_id == "quiz_id control con orden equivocad
 evaluaciones$evaluacion<-paste(evaluaciones$ce, evaluaciones$orden, sep = " " )
 
 
-# Para acelerar proceso de informes de pruebas, se guardan estos archivos csv.
+# Para acelerar proceso de informes de pruebas, se guardan los df de evaluaciones y data_est.
 
-write.csv2(evaluaciones, file = "~/Canvas Data/Reportes Rmakdown/bd_evaluaciones.csv", fileEncoding = "UTF-8", row.names = FALSE)
-write.csv2(data_est, file = "~/Canvas Data/Reportes Rmakdown/data_est.csv", fileEncoding = "UTF-8", row.names = FALSE)
+save(evaluaciones, file = "~/Canvas Data/Reportes por liceo/bd_evaluaciones.Rdata")
+save(data_est, file = "~/Canvas Data/Reportes por liceo/data_est.Rdata")
 
 
 
