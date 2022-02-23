@@ -9,7 +9,7 @@ Proceso de descarga y actualización de datos de Canvas
 ```npm install -g canvas-data-cli```
 3. Configurar credenciales API Canvas.  
   En ```config.js``` reemplazar 'your_canvas_api_key' y 'your_canvas_api_secret' por credenciales de la API de Canvas.
-4. Instalar paquetes necesarios en R:
+4. Instalar paquetes necesarios en R:  
 -tidyverse  
 -googlesheets4  
 -reshape2
